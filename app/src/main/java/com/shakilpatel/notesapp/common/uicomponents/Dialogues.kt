@@ -1,0 +1,217 @@
+package com.shakilpatel.notesapp.common.uicomponents
+
+import androidx.compose.animation.core.snap
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.easy.translator.EasyTranslator
+import com.easy.translator.LanguagesModel
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.shakilpatel.notesapp.R
+import com.shakilpatel.notesapp.common.Cons
+import com.shakilpatel.notesapp.common.HorizontalBrush
+import com.shakilpatel.notesapp.common.MainColor
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+
+@Composable
+fun UpdateDialogue(latestVersion: String, onBack: () -> Unit) {
+    val context = LocalContext.current
+    AlertDialog(onDismissRequest = { /*TODO*/ },
+        confirmButton = {
+            var updateLink by remember { mutableStateOf("") }
+
+            Button(onClick = {
+                FirebaseDatabase.getInstance().reference.child("updateLink")
+                    .addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                updateLink = snapshot.value.toString()
+                                Cons.gotoUrl(updateLink, context)
+                            }
+
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                        }
+
+                    })
+            }) {
+                Text("Update Now To $latestVersion version")
+
+            }
+        },
+        dismissButton = {
+            Button(onClick = {
+                onBack()
+            }) {
+                Text("Close App")
+            }
+        },
+        title = {
+            var message by remember { mutableStateOf("") }
+            FirebaseDatabase.getInstance().reference.child("message")
+                .addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+                            message = snapshot.value.toString()
+                        }
+
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+
+                })
+            Text(message)
+        })
+}
+
+@Composable
+fun TranslateDialog(onSuccess: (DropDownItemData) -> Unit, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val translator = EasyTranslator(context)
+    var data by remember { mutableStateOf(DropDownItemData()) }
+    var isTransLoading by remember { mutableStateOf(false) }
+    Dialog(
+        onDismissRequest = {
+            onDismiss()
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Card(modifier = Modifier.fillMaxWidth(.8f)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(HorizontalBrush),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Sp(h = 5.dp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_translate),
+                        contentDescription = "",
+                        tint = MainColor
+                    )
+                    Text("Translate")
+                }
+                Sp(h = 5.dp)
+                Divider(thickness = 1.dp, color = Color.Gray, modifier = Modifier.fillMaxWidth())
+
+                CusDropdownSearch(
+                    selectedItem = DropDownItemData(
+                        LanguagesModel.ENGLISH.shortCode,
+                        LanguagesModel.ENGLISH.langName
+                    ),
+                    label = "Language",
+                    hint = "Search your language",
+                    options = translator.getLanguagesList()
+                        .map { DropDownItemData(it.shortCode, it.langName) },
+                    onSelected = {
+                        // Clear previous translations
+                        data = it
+                    }
+                )
+                Sp(h = 5.dp)
+                Sp(h = 10.dp)
+                if (isTransLoading) {
+                    CircularProgressIndicator(color = MainColor, modifier = Modifier.padding(30.dp))
+                }
+                Sp(h = 10.dp)
+                CustomOutlinedButton(
+                    label = "Translate Now",
+                    isEnable = data != DropDownItemData()
+                ) {
+                    onSuccess(data)
+                    isTransLoading = true
+                }
+                Sp(h = 5.dp)
+            }
+        }
+    }
+}
+
+@Composable
+fun SnackBarCus(msg: String) {
+    val coroutineScope = rememberCoroutineScope()
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(true) {
+        // Show the Snackbar
+        coroutineScope.launch {
+            isVisible = true
+        }
+
+        // Delay for 3 to 5 seconds and then hide the Snackbar
+        delay(3000L)
+        coroutineScope.launch {
+            isVisible = false
+        }
+    }
+    if (isVisible) {
+        Dialog(onDismissRequest = {
+            isVisible = false
+        }) {
+            Snackbar(
+                modifier = Modifier
+                    .padding(8.dp),
+                action = {}
+            ) {
+                Text(text = msg, color = Color.White)
+            }
+        }
+
+    }
+}
+
+@Composable
+fun ConfirmationDialog(msg: String, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(onDismissRequest = onDismiss,
+        text = {},
+        title = {
+            Text(msg)
+        },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Close")
+            }
+        })
+}
