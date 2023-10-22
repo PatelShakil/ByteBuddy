@@ -104,6 +104,7 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-pager-indicators:0.13.0")
 
     //pdf reader
+    implementation("com.github.afreakyelf:Pdf-Viewer:v1.1.2")
     implementation ("io.github.grizzi91:bouquet:1.1.2")
     implementation ("com.itextpdf:itextg:5.5.10")
 

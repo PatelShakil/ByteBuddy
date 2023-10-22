@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +62,7 @@ import androidx.navigation.NavController
 import com.easy.translator.EasyTranslator
 import com.easy.translator.LanguagesModel
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.rajat.pdfviewer.PdfViewerActivity
 import com.rizzi.bouquet.ResourceType
 import com.rizzi.bouquet.VerticalPDFReader
 import com.rizzi.bouquet.rememberVerticalPdfReaderState
@@ -69,6 +71,7 @@ import com.shakilpatel.notesapp.common.HorizontalBrush
 import com.shakilpatel.notesapp.common.MainColor
 import com.shakilpatel.notesapp.common.Resource
 import com.shakilpatel.notesapp.common.TextColor
+import com.shakilpatel.notesapp.common.WhiteColor
 import com.shakilpatel.notesapp.common.getHorizontalGradient
 import com.shakilpatel.notesapp.common.getVerticalGradient
 import com.shakilpatel.notesapp.common.uicomponents.ConfirmationDialog
@@ -89,8 +92,64 @@ fun ViewNotesScreen(notesId: String, viewModel: NotesViewModel, navController: N
     ByteBuddyTheme {
         Column {
             HideSystemBars()
-            TabLayout(notesId, viewModel, navController)
+//            TabLayout(notesId, viewModel, navController)
+            var curState by remember{ mutableStateOf("Text") }
+            viewModel.getNote(notesId){
+
+            }
+            var notes = NotesModel()
+            viewModel.notes.collectAsState().value.let {
+                when (it) {
+                    is Resource.Success -> {
+                        notes = it.result
+                        viewModel.curNote.value = notes
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 5.dp),
+                            horizontalArrangement = Arrangement.SpaceAround){
+                            CheckButton(title = "Text", isSelected = curState == "Text") {
+                                curState = "Text"
+                            }
+                            val context = LocalContext.current
+                            viewModel.curNote.value = notes
+                            CheckButton(title = "PDF", isSelected = curState == "PDF") {
+                                context.startActivity(PdfViewerActivity.launchPdfFromUrl(
+                                    context,
+                                    notes.pdfFile,
+                                    notes.title,
+                                    "Downloads",
+                                    false
+                                ))
+                                curState = "Text"
+                            }
+
+                        }
+                    }
+                    else -> {}
+                }
+            }
+
+            if(curState == "Text"){
+            TextScreen(viewModel = viewModel)
         }
+        }
+    }
+}
+
+@Composable
+fun CheckButton(title:String,isSelected : Boolean, onClick:()->Unit) {
+    Box(
+        modifier = Modifier
+            .background(if (isSelected) MainColor else Color.White, RoundedCornerShape(20.dp))
+            .clickable {
+                onClick()
+            },
+    contentAlignment = Alignment.Center
+    ){
+        Text(title,
+            color = if(isSelected) WhiteColor else MainColor,
+            modifier = Modifier.padding(horizontal = 15.dp,vertical = 2.dp),
+            style = MaterialTheme.typography.titleMedium)
     }
 }
 
@@ -156,7 +215,7 @@ fun TabLayout(notesId: String, viewModel: NotesViewModel, navController: NavCont
             Tabs(
                 pagerState = pagerState, modifier = Modifier.height(40.dp),
                 if (note.value.text.isEmpty()) listOf("PDF")
-                else listOf("PDF", "Text")
+                else listOf("Text", "PDF")
             )
             Box(modifier = Modifier.fillMaxWidth()) {
                 TabsContent(pagerState = pagerState, viewModel, navController)
@@ -219,17 +278,29 @@ fun TabsContent(pagerState: PagerState, viewModel: NotesViewModel, navController
             is Resource.Success -> {
                 notes = it.result
                 viewModel.curNote.value = notes
-                HorizontalPager(state = pagerState, userScrollEnabled = false) { page ->
-                    when (page) {
-                        0 -> {
-                            PDFScreen(viewModel = viewModel, navController)
-                        }
+                when(pagerState.currentPage){
+                    0 -> {
+                        TextScreen(viewModel = viewModel)
 
-                        1 -> {
-                            TextScreen(viewModel = viewModel)
-                        }
+                    }
+
+                    1 -> {
+//                            PDFScreen(viewModel = viewModel, navController)
+                        val context = LocalContext.current
+                        context.startActivity(PdfViewerActivity.launchPdfFromUrl(
+                            context,
+                            notes.pdfFile,
+                            notes.title,
+                            "Downloads",
+                            false
+                        ))
                     }
                 }
+//                HorizontalPager(state = pagerState, userScrollEnabled = false) { page ->
+//                    when (page) {
+//
+//                    }
+//                }
             }
 
             else -> {}
