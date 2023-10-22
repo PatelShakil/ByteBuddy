@@ -94,15 +94,15 @@ fun ViewNotesScreen(notesId: String, viewModel: NotesViewModel, navController: N
             HideSystemBars()
 //            TabLayout(notesId, viewModel, navController)
             var curState by remember{ mutableStateOf("Text") }
-            viewModel.getNote(notesId){
-
+            LaunchedEffect(key1 = true){
+                viewModel.getNote(notesId){
+                    viewModel.notes.value = it
+                }
             }
-            var notes = NotesModel()
             viewModel.notes.collectAsState().value.let {
                 when (it) {
                     is Resource.Success -> {
-                        notes = it.result
-                        viewModel.curNote.value = notes
+                        viewModel.curNote.value = it.result
                         Row(modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 5.dp),
@@ -111,12 +111,11 @@ fun ViewNotesScreen(notesId: String, viewModel: NotesViewModel, navController: N
                                 curState = "Text"
                             }
                             val context = LocalContext.current
-                            viewModel.curNote.value = notes
                             CheckButton(title = "PDF", isSelected = curState == "PDF") {
                                 context.startActivity(PdfViewerActivity.launchPdfFromUrl(
                                     context,
-                                    notes.pdfFile,
-                                    notes.title,
+                                    it.result.pdfFile,
+                                    it.result.title,
                                     "Downloads",
                                     false
                                 ))
@@ -452,6 +451,7 @@ fun TextScreen(viewModel: NotesViewModel) {
         LaunchedEffect(key1 = true, block = {
             textList = viewModel.curNote.value.text
             textListOg = viewModel.curNote.value.text
+            Log.d("TextList",textListOg.toString())
         })
         val listState = rememberLazyListState()
         var resultCount by remember { mutableStateOf(0) }
