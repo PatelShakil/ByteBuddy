@@ -34,4 +34,5 @@ sealed class Screen(val route: String, var title: String = "") {
     object ViewNotes : Screen("view_notes") {
         object Landing : Screen("view_notes_landing")
     }
+    object Notification : Screen("notification","Notification")
 }

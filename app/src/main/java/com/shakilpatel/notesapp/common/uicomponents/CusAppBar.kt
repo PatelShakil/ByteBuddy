@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.play.integrity.internal.w
+import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.AppBarTextColor
 import com.shakilpatel.notesapp.common.MainColor
 import com.shakilpatel.notesapp.common.TextColor
@@ -60,6 +63,9 @@ fun CusAppBar(navController: NavController, viewModel: AuthViewModel) {
         Screen.Main.Profile.Uploaded.route -> Screen.Main.Profile.Uploaded.title
         Screen.Main.Profile.Saved.route -> Screen.Main.Profile.Saved.title
 
+        //Notification
+        Screen.Notification.route -> Screen.Notification.title
+
         // ViewNotes Screens
         Screen.ViewNotes.Landing.route -> Screen.ViewNotes.Landing.title
 
@@ -73,6 +79,10 @@ fun CusAppBar(navController: NavController, viewModel: AuthViewModel) {
         }
 
         Screen.Main.Profile.Saved.route -> {
+            DefaultAppBar(title = title, navController = navController, viewModel = viewModel)
+
+        }
+        Screen.Notification.route -> {
             DefaultAppBar(title = title, navController = navController, viewModel = viewModel)
 
         }
@@ -119,6 +129,17 @@ fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthVi
                     isLogoutClicked = !isLogoutClicked
 
                 })
+            Sp(w = 10.dp)
+            if (navController.currentBackStackEntryAsState().value?.destination?.route != Screen.Notification.route) {
+                Icon(painterResource(R.drawable.ic_notifications),"",
+                    tint = WhiteColor,
+                    modifier = Modifier.clickable{
+                        navController.navigate(Screen.Notification.route)
+                    })
+                Sp(w = 10.dp)
+            }
+
+
         },
         backgroundColor = MainColor
     )

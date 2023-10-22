@@ -1,5 +1,6 @@
 package com.shakilpatel.notesapp.common.uicomponents
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,6 +48,19 @@ fun CircularImage(size: Dp,image: String?,onClick:()->Unit) {
                 contentScale = ContentScale.Crop
             )
         }
+    }
+}
+
+@Composable
+fun CircularImage(icon: Int, size: Dp) {
+    Box(modifier = Modifier
+        .size(size)
+        .clip(CircleShape),
+    contentAlignment = Alignment.Center){
+            Icon(
+                painterResource(id = icon), "",
+                tint = MainColor
+            )
     }
 }
 @Composable

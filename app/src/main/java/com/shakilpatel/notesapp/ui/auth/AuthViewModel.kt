@@ -128,9 +128,11 @@ class AuthViewModel @Inject constructor(
                     is Resource.Success -> {
                         email.value = auth.currentUser?.email.toString()
                         if (it.result) {
-                            navController.navigate(Screen.Main.route) {
-                                popUpTo(Screen.Auth.route)
-                            }
+
+                                navController.navigate(Screen.Main.route){
+                                    popUpTo(Screen.Auth.route)
+                                }
+
                         } else
                             navController.navigate(Screen.Auth.Signup.route + "/${email.value}")
                     }

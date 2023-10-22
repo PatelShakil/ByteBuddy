@@ -8,6 +8,7 @@ data class NotificationModel(
     val message:String,
     val faq:String,
     val notesId:String,
+    var read:Boolean,
     val date : Long
 ){
     constructor():this(
@@ -16,6 +17,7 @@ data class NotificationModel(
         "",
         "",
         "",
+        false,
         0
     )
 }

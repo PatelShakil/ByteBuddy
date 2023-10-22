@@ -139,7 +139,7 @@ fun AboutUsScreen(viewModel: ProfileViewModel) {
                     Text("Made with ❤")
                     Sp(h = 5.dp)
                     Text(
-                        "Version ${Cons.getCurrentVersionCode(context)}.0",
+                        "Version ${Cons.getCurrentVersionName(context)}",
                         fontFamily = FontFamily.Monospace,
                         style = MaterialTheme.typography.bodySmall,
                         fontSize = 12.sp

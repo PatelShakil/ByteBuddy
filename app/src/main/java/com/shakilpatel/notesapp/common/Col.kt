@@ -24,6 +24,7 @@ val VerticalBrush = Brush.verticalGradient(
 val SecondaryColor = Color(0xFF5B74FF)
 val TernaryColor = Color(0xFF5B74FF)
 val WhiteColor = Color(0xFFFFFFFF)
+val NotificationUnReadColor = Color(0xFFDDDCDC)
 val BlackColor = Color(0xFF000000)
 val AppBarTextColor = Color(0xFFFFFFFF)
 val BorderColor = Color(0xFF664FA1)

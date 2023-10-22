@@ -60,22 +60,22 @@ class ErrorRepo @Inject constructor(
                         ansRef.set(faq)
                             .addOnSuccessListener {
                                 Log.d("Done", true.toString())
-                                    commonRepo.getUserNameFromUid(auth.uid.toString()) { name ->
-                                        commonRepo.getTokenFromUid(ans.userId) { token ->
-                                            com.shakilpatel.notesapp.data.notification.Cons.sendNotification(
-                                                com.shakilpatel.notesapp.data.notification.PushNotification(
-                                                    com.shakilpatel.notesapp.data.notification.NotificationData(
-                                                        faq.title,
-                                                        "$name has Upvoted👍 your Answer on #${faq.id}",
-                                                        "",
-                                                        "faq"
-                                                    ),
-                                                    token
+                                        commonRepo.getUserNameFromUid(auth.uid.toString()) { name ->
+                                            commonRepo.getTokenFromUid(ans.userId) { token ->
+                                                com.shakilpatel.notesapp.data.notification.Cons.sendNotification(
+                                                    com.shakilpatel.notesapp.data.notification.PushNotification(
+                                                        com.shakilpatel.notesapp.data.notification.NotificationData(
+                                                            faq.title,
+                                                            "$name has Upvoted👍 your Answer on #${faq.id} faqs",
+                                                            "",
+                                                            "faq"
+                                                        ),
+                                                        token
+                                                    )
                                                 )
-                                            )
-                                        }
+                                            }
 
-                                    }
+                                        }
                             }
                     }
                 }
@@ -132,7 +132,7 @@ class ErrorRepo @Inject constructor(
                                                 com.shakilpatel.notesapp.data.notification.PushNotification(
                                                     com.shakilpatel.notesapp.data.notification.NotificationData(
                                                         faq.title,
-                                                        "$name has Downvoted👎 your Answer on #${faq.id}",
+                                                        "$name has Downvoted👎 your Answer on #${faq.id} faqs",
                                                         "",
                                                         "faq"
                                                     ),

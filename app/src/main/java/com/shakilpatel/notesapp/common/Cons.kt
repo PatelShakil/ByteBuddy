@@ -80,6 +80,15 @@ class Cons() {
             }
             return packageInfo!!.versionCode
         }
+        fun getCurrentVersionName(context: Context): String {
+            var packageInfo: PackageInfo? = null
+            try {
+                packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            } catch (e: java.lang.Exception) {
+                Log.d("Exception", e.localizedMessage)
+            }
+            return packageInfo!!.versionName
+        }
 
         fun encodeImage(bitmap: Bitmap): String {
             var pwidth = bitmap.width

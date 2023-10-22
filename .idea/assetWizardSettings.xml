@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/$PROJECT_DIR$/../../../../SDK/icons/material/materialicons/notifications_active/baseline_notifications_active_24.xml" />
+                                      <entry key="url" value="file:/$PROJECT_DIR$/../../../../SDK/icons/material/materialicons/notes/baseline_notes_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,7 +28,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_notifications" />
+                            <entry key="outputName" value="ic_notes" />
                             <entry key="sourceFile" value="C:\Users\Salman Patel\AndroidStudioProjects\ByteBuddy" />
                           </map>
                         </option>

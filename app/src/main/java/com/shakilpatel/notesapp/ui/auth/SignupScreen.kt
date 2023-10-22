@@ -184,7 +184,9 @@ fun SignupScreen(email: String, viewModel: AuthViewModel, navController: NavCont
                                         college,
                                         System.currentTimeMillis(),
                                         "",
-                                        SavedModel()
+                                        0,
+                                        SavedModel(),
+                                        emptyList()
                                     ), navController
                                 )
                             }

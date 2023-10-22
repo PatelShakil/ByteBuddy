@@ -1,5 +1,6 @@
 package com.shakilpatel.notesapp.ui.nav
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -18,17 +19,23 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
+import com.google.firebase.auth.FirebaseAuth
 import com.shakilpatel.notesapp.common.uicomponents.BadgeBottomNavigation
 import com.shakilpatel.notesapp.common.uicomponents.CusAppBar
 import com.shakilpatel.notesapp.ui.nav.navigations.AuthNav
 import com.shakilpatel.notesapp.ui.nav.navigations.MainNav
+import com.shakilpatel.notesapp.ui.nav.navigations.NotiNav
+import com.shakilpatel.notesapp.ui.notification.NotificationScreen
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 
 @Composable
 fun NotesAppNavHost(onBack: () -> Unit) {
     val navController = rememberNavController()
+
     var isAppbarVisible by remember { mutableStateOf(false) }
     var isBottomNavVisible by remember { mutableStateOf(false) }
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -90,6 +97,8 @@ fun NotesAppNavHost(onBack: () -> Unit) {
                 }
             }
         ) {
+            Log.d("UID",FirebaseAuth.getInstance().uid.toString())
+
             NavHost(
                 modifier = Modifier.padding(it),
                 navController = navController,
@@ -101,9 +110,20 @@ fun NotesAppNavHost(onBack: () -> Unit) {
                 MainNav(navController) {
                     onBack()
                 }
+//                NotiNav(navController)
+                composable(Screen.Notification.route,
+                    deepLinks = listOf(
+                        navDeepLink {
+                            uriPattern = "bytebuddy://example.com/notification"
+                        }
+                    )
+                ){
+                    NotificationScreen(viewModel = hiltViewModel(), navController = navController)
+                }
             }
         }
     }
+
 }
 
 @Composable

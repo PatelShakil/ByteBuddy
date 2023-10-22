@@ -29,6 +29,18 @@ class CommonRepo @Inject constructor(
     private val auth: FirebaseAuth
 ) {
 
+    fun checkUserIsOnline(uid: String, onResult: (Boolean) -> Unit) {
+        db.collection("users")
+            .document(uid)
+            .addSnapshotListener { value, error ->
+                if (value != null) {
+                    if (value.exists()) {
+                        val user = value.toObject(UserModel::class.java)!!
+                        onResult(user.online)
+                    }
+                }
+            }
+    }
 
     fun registerUserToken(){
         val userRef = db.collection("users")
@@ -40,7 +52,7 @@ class CommonRepo @Inject constructor(
                         user.token = it.toString()
                         userRef.set(user)
                             .addOnSuccessListener {
-                                Log.d("Token",user.toString())
+                                Log.d("Token",user.token)
                             }
                     }
 
