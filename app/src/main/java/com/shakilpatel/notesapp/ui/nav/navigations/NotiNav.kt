@@ -17,6 +17,6 @@ fun NavGraphBuilder.NotiNav(navController: NavController) {
             }
         )
     ){
-        NotificationScreen(viewModel = hiltViewModel(), navController = navController)
+        NotificationScreen(viewModel = hiltViewModel(), hiltViewModel(), navController = navController)
     }
 }

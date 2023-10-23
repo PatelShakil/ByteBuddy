@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import com.shakilpatel.notesapp.common.MainColor
 
 @Composable
-fun SearchBar(hint: String, onTextChanged: (String) -> Unit) {
-    var value by remember { mutableStateOf("") }
+fun SearchBar(hint: String,searchStr:String = "", onTextChanged: (String) -> Unit) {
+    var value by remember { mutableStateOf(searchStr) }
     Column(
         modifier = Modifier
             .fillMaxWidth()

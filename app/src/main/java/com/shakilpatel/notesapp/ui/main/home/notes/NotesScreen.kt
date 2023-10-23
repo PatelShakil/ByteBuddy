@@ -55,21 +55,6 @@ import com.shakilpatel.notesapp.data.models.learning.NotesModel
 import com.shakilpatel.notesapp.data.models.user.UserModel
 import com.shakilpatel.notesapp.ui.nav.Screen
 
-//class NotesViewActivity : AppCompatActivity() {
-//    lateinit var binding: ActivityNotesViewBinding
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        binding = ActivityNotesViewBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//
-//        val subject = intent.getStringExtra("subject")!!
-//        val viewModel = NotesViewModel(NotesRepo(), CommonRepo(),this)
-//
-//        binding.notesViewCompose.setContent {
-//            NotesScreen(viewModel, subject)
-//        }
-//    }
-//}
 
 @Composable
 fun NotesScreen(
@@ -207,7 +192,8 @@ fun NotesColCard(
                 notesListOg = list
                 var query by remember { mutableStateOf("") }
                 SearchBar(
-                    hint = "Search notes in ${list.get(0).subjectId.substring(0, 8) + "..."}",
+                    hint = "Search notes in ${if(list[0].subjectId.length >= 8 ) list[0].subjectId.substring(0, 8) + "..." else list[0].subjectId}",
+                    "",
                     onTextChanged = {
                         query = it
                     })

@@ -118,7 +118,7 @@ fun NotesAppNavHost(onBack: () -> Unit) {
                         }
                     )
                 ){
-                    NotificationScreen(viewModel = hiltViewModel(), navController = navController)
+                    NotificationScreen(viewModel = hiltViewModel(), hiltViewModel(), navController = navController)
                 }
             }
         }

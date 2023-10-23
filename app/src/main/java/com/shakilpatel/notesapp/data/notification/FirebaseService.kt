@@ -120,7 +120,8 @@ class FirebaseService : FirebaseMessagingService() {
     fun checkUserIsOnline(uid: String, onResult: (Boolean) -> Unit) {
         FirebaseFirestore.getInstance().collection("users")
             .document(uid)
-            .addSnapshotListener { value, error ->
+            .get()
+            .addOnSuccessListener { value ->
                 if (value != null) {
                     if (value.exists()) {
                         val user = value.toObject(UserModel::class.java)!!

@@ -57,7 +57,7 @@ sealed class BottomBarScreen(
 
     // for report
     object Feed : BottomBarScreen(
-        route = Screen.Main.Feed.route,
+        route = Screen.Main.Feed.Landing.route +"/${"#"}" ,
         title = "Feed",
         icon = R.drawable.ic_feed,
         icon_focused = R.drawable.ic_feed

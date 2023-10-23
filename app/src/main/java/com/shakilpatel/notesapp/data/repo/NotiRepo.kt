@@ -24,7 +24,10 @@ class NotiRepo @Inject constructor(
                 if(value != null){
                     if(value.exists()){
                         val user = value.toObject(UserModel::class.java)!!
-                        onResult(Resource.Success(user.notifications))
+                        if(user.notifications.isNotEmpty())
+                            onResult(Resource.Success(user.notifications))
+                        else
+                            onResult(Resource.Failure(Exception("No Notifications Available"),"oops☹... no notifications available at this time"))
                     }else{
                         onResult(Resource.Failure(Exception("No Notifications Available"),"oops☹... no notifications available at this time"))
                     }

@@ -16,7 +16,7 @@ import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
 @Composable
-fun FeedScreen(navController: NavController, onBack: () -> Unit) {
+fun FeedScreen(faqId : String,navController: NavController, onBack: () -> Unit) {
 //    BackHandler {
 //        onBack()
 //    }
@@ -30,7 +30,7 @@ fun FeedScreen(navController: NavController, onBack: () -> Unit) {
     ByteBuddyTheme {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            FaqScreen(viewModel = hiltViewModel(), navController = navController)
+            FaqScreen(faqId,viewModel = hiltViewModel(), navController = navController)
 //            Tabs(pagerState = pagerState, modifier = Modifier, list = listOf("Faq"))
 //            Box(modifier = Modifier.fillMaxSize()) {
 //                FeedTabsContent(pagerState, navController)
@@ -39,6 +39,7 @@ fun FeedScreen(navController: NavController, onBack: () -> Unit) {
     }
 }
 
+/*
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FeedTabsContent(pagerState: PagerState, navController: NavController) {
@@ -51,4 +52,4 @@ fun FeedTabsContent(pagerState: PagerState, navController: NavController) {
         }
 
     }
-}
+}*/

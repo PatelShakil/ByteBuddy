@@ -30,7 +30,8 @@ class MyApplication : Application() {
         val db = FirebaseFirestore.getInstance()
         val settings = firestoreSettings {
             // Use memory cache
-            setLocalCacheSettings(memoryCacheSettings {})
+            setLocalCacheSettings(memoryCacheSettings {
+            })
             // Use persistent disk cache (default)
             setLocalCacheSettings(persistentCacheSettings {
             })

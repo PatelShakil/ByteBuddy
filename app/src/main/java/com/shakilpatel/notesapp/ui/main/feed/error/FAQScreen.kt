@@ -2,7 +2,13 @@
 
 package com.shakilpatel.notesapp.ui.main.feed.error
 
+//import com.google.accompanist.pager.PagerDefaults
+//import com.google.accompanist.pager.VerticalPager
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -29,6 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,6 +50,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -50,12 +59,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.navigation.NavController
 import com.google.accompanist.pager.ExperimentalPagerApi
-//import com.google.accompanist.pager.PagerDefaults
-//import com.google.accompanist.pager.VerticalPager
+import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.Cons
 import com.shakilpatel.notesapp.common.Resource
+import com.shakilpatel.notesapp.common.WhiteColor
 import com.shakilpatel.notesapp.common.getVerticalGradient
 import com.shakilpatel.notesapp.common.uicomponents.FAQAppBar
 import com.shakilpatel.notesapp.common.uicomponents.FAQIteration
@@ -68,7 +78,7 @@ import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 
 
 @Composable
-fun FaqScreen(viewModel: FAQViewModel, navController: NavController) {
+fun FaqScreen(faqId:String,viewModel: FAQViewModel, navController: NavController) {
     val list = viewModel.errorsList.collectAsState()
     ByteBuddyTheme {
         list.value.let {
@@ -79,8 +89,8 @@ fun FaqScreen(viewModel: FAQViewModel, navController: NavController) {
                     listOg = it.result
 //                        it.result + it.result + it.result + it.result + it.result + it.result + it.result + it.result + it.result
                     var resultCount by remember { mutableStateOf(0) }
-                    var query by remember { mutableStateOf("") }
-                    FAQAppBar(title = "FAQ", resultCount, navController = navController) { value ->
+                    var query by remember { mutableStateOf(faqId.replace("#","")) }
+                    FAQAppBar(title = "FAQ",faqId.replace("#",""), resultCount, navController = navController) { value ->
                         query = value
 //                        dummylist = if (value.isNotEmpty()) {
 //                            listOg.filter {
@@ -99,7 +109,7 @@ fun FaqScreen(viewModel: FAQViewModel, navController: NavController) {
                     } else {
                         dummylist = if (query != "") {
                             listOg.filter {
-                                it.title.lowercase().contains(query) || it.description.lowercase()
+                                it.title.lowercase().contains(query) || it.description.lowercase().contains(query) || it.id
                                     .contains(query)
                             }
                         } else
@@ -304,21 +314,44 @@ fun CodeViewText(code: String) {
             .fillMaxWidth()
 //        .padding(horizontal = 10.dp)
             .height(110.dp)
+            .verticalScroll(rememberScrollState())
+
     ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-                .verticalScroll(rememberScrollState())
-                .height(110.dp)
-                .background(Color.Black)
-                .padding(10.dp),
-            text = code,
-            fontFamily = FontFamily.Monospace,
-            fontSize = 12.sp,
-            color = Color.White,
-            softWrap = true
-        )
+        Box {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .height(110.dp)
+                    .background(Color.Black)
+                    .padding(10.dp),
+                text = code,
+                fontFamily = FontFamily.Monospace,
+                fontSize = 12.sp,
+                color = Color.White,
+                softWrap = true
+            )
+            val context = LocalContext.current
+            Icon(painterResource(id = R.drawable.ic_copy),"",
+                tint = WhiteColor,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(5.dp)
+                    .size(15.dp)
+                    .clickable {// Get a reference to the ClipboardManager
+                        // Get a reference to the ClipboardManager
+                        val clipboardManager: ClipboardManager? =
+                            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+                        val clipData = ClipData.newPlainText("code from ByteBuddy", code)
+                        if (clipboardManager != null) {
+                            clipboardManager.setPrimaryClip(clipData)
+                            Toast
+                                .makeText(context, "Code Copied Successfully", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    })
+        }
+
 
     }
 }

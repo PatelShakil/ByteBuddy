@@ -30,8 +30,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Tab
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -40,6 +43,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -84,6 +88,7 @@ import com.shakilpatel.notesapp.common.uicomponents.TranslateDialog
 import com.shakilpatel.notesapp.data.models.learning.NotesModel
 import com.shakilpatel.notesapp.data.models.learning.NotesPage
 import com.shakilpatel.notesapp.ui.main.create.TabIndicator
+import com.shakilpatel.notesapp.ui.main.create.TabsContent
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 import kotlinx.coroutines.launch
 
@@ -123,14 +128,15 @@ fun ViewNotesScreen(notesId: String, viewModel: NotesViewModel, navController: N
                             }
 
                         }
+                        if(curState == "Text"){
+                            TextScreen(it.result,viewModel = viewModel)
+                        }
                     }
                     else -> {}
                 }
             }
 
-            if(curState == "Text"){
-            TextScreen(viewModel = viewModel)
-        }
+
         }
     }
 }
@@ -185,44 +191,6 @@ fun Context.findActivity(): Activity? {
     return null
 }
 
-@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
-@Composable
-fun TabLayout(notesId: String, viewModel: NotesViewModel, navController: NavController) {
-    val note = remember { mutableStateOf(NotesModel()) }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        viewModel.getNote(notesId) {
-            when (it) {
-                is Resource.Success -> {
-                    note.value = it.result
-                }
-
-                else -> {}
-            }
-
-        }
-        val pagerState = rememberPagerState(
-            initialPage = 0,
-            initialPageOffsetFraction = 0f
-        ) {
-            // provide pageCount
-            if (note.value.text.isEmpty()) 1 else 2
-        }
-        Column {
-            Tabs(
-                pagerState = pagerState, modifier = Modifier.height(40.dp),
-                if (note.value.text.isEmpty()) listOf("PDF")
-                else listOf("Text", "PDF")
-            )
-            Box(modifier = Modifier.fillMaxWidth()) {
-                TabsContent(pagerState = pagerState, viewModel, navController)
-            }
-
-        }
-    }
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalPagerApi
@@ -266,6 +234,7 @@ fun Tabs(
         }
     }
 }
+/*
 
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalPagerApi
@@ -307,6 +276,7 @@ fun TabsContent(pagerState: PagerState, viewModel: NotesViewModel, navController
     }
 
 }
+*/
 
 /*
 class RetrievePDFfromUrl() : AsyncTask<String, Void, InputStream>() {
@@ -351,6 +321,7 @@ class RetrievePDFfromUrl() : AsyncTask<String, Void, InputStream>() {
 }
 */
 
+/*
 @Composable
 fun PDFScreen(viewModel: NotesViewModel, navController: NavController) {
 
@@ -424,22 +395,11 @@ fun PDFScreen(viewModel: NotesViewModel, navController: NavController) {
         }
     }
 }
+*/
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
-fun TextScreen(viewModel: NotesViewModel) {
-//    VerticalPager(pageCount=list.size,modifier = Modifier.fillMaxSize(),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        userScrollEnabled = true,
-//        pageNestedScrollConnection = androidx.compose.foundation.pager.PagerDefaults.pageNestedScrollConnection(
-//            orientation = Orientation.Vertical
-//        )){
-//        TranslatePageItem(list[it]){
-//
-//        }
-//    }
-//    var upList = remember{ list }
-
+fun TextScreen(note:NotesModel,viewModel: NotesViewModel) {
 
     Column(
         modifier = Modifier
@@ -449,17 +409,17 @@ fun TextScreen(viewModel: NotesViewModel) {
         var textList by remember { mutableStateOf(listOf<NotesPage>()) }
         var textListOg by remember { mutableStateOf(listOf<NotesPage>()) }
         LaunchedEffect(key1 = true, block = {
-            textList = viewModel.curNote.value.text
-            textListOg = viewModel.curNote.value.text
-            Log.d("TextList",textListOg.toString())
+            textList = note.text
+            textListOg = note.text
+            Log.d("TextList", textListOg.toString())
         })
         val listState = rememberLazyListState()
-        var resultCount by remember { mutableStateOf(0) }
+        var resultCount by remember { mutableIntStateOf(0) }
         var query by remember { mutableStateOf("") }
-        AnimatedVisibility(visible = remember { derivedStateOf { listState.firstVisibleItemScrollOffset } }.value <= 0) {
-            Column {
+        var isSearchBarVisible by remember { mutableStateOf(true) }
+        Column {
                 SearchBar(
-                    hint = "Search in ${viewModel.curNote.value.title}",
+                    hint = "Search in ${note.title}",
                     onTextChanged = { value ->
                         query = value
                         textList = if (value.isNotEmpty()) {
@@ -467,7 +427,8 @@ fun TextScreen(viewModel: NotesViewModel) {
                         } else
                             textListOg
                         resultCount = if (value.isNotEmpty()) textList.size else 0
-                    })
+                    }
+                )
                 if (resultCount > 0) {
                     Text(
                         text = "'$query' found in $resultCount pages. ",
@@ -480,14 +441,14 @@ fun TextScreen(viewModel: NotesViewModel) {
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
-            }
 
+                TransItems(
+                    modifier = Modifier,
+                    state = listState,
+                    list = textList,
+                    viewModel = viewModel
+                )
         }
-        TransItems(
-            modifier = Modifier,
-            state = listState,
-            list = textList, viewModel = viewModel
-        )
     }
 
 }

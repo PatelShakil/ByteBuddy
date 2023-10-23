@@ -68,7 +68,7 @@ class ErrorRepo @Inject constructor(
                                                             faq.title,
                                                             "$name has Upvoted👍 your Answer on #${faq.id} faqs",
                                                             "",
-                                                            "faq"
+                                                            faq.id
                                                         ),
                                                         token
                                                     )
@@ -134,7 +134,7 @@ class ErrorRepo @Inject constructor(
                                                         faq.title,
                                                         "$name has Downvoted👎 your Answer on #${faq.id} faqs",
                                                         "",
-                                                        "faq"
+                                                        faq.id
                                                     ),
                                                     token
                                                 )
@@ -166,7 +166,7 @@ class ErrorRepo @Inject constructor(
                                     error.title,
                                     "$it has asked '${error.title}?' \n Did you know about it?",
                                     "",
-                                    "faq"
+                                    error.id
                                 ),
                                 Cons.TOPIC_ALL
                             )
@@ -264,7 +264,7 @@ class ErrorRepo @Inject constructor(
                                                 "$name Answered your FAQ",
                                                 "${faqAns.message}",
                                                 "",
-                                                "faq"
+                                                faqModel.id
                                             ),
                                             token
                                         )

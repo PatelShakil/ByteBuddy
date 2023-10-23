@@ -29,6 +29,18 @@ class CommonRepo @Inject constructor(
     private val auth: FirebaseAuth
 ) {
 
+
+    fun getUnreadNotiCount(uid:String,onResult:(Int) ->Unit){
+        db.collection("users")
+            .document(uid)
+            .addSnapshotListener { value, error ->
+                if(value != null && value.exists()){
+                    val userModel = value.toObject(UserModel::class.java)!!
+                    onResult(userModel.notifications.filter { !it.read }.size)
+                }
+            }
+    }
+
     fun checkUserIsOnline(uid: String, onResult: (Boolean) -> Unit) {
         db.collection("users")
             .document(uid)

@@ -3,11 +3,13 @@ package com.shakilpatel.notesapp.common.uicomponents
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -22,22 +24,31 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.play.integrity.internal.c
 import com.google.android.play.integrity.internal.w
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.AppBarTextColor
 import com.shakilpatel.notesapp.common.MainColor
+import com.shakilpatel.notesapp.common.RedColor
 import com.shakilpatel.notesapp.common.TextColor
 import com.shakilpatel.notesapp.common.WhiteColor
+import com.shakilpatel.notesapp.data.models.user.UserModel
 import com.shakilpatel.notesapp.ui.auth.AuthViewModel
 import com.shakilpatel.notesapp.ui.nav.Screen
 
@@ -130,12 +141,27 @@ fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthVi
 
                 })
             Sp(w = 10.dp)
+            viewModel.getUnreadNotiCount()
+            val c = viewModel.notiCount.intValue
             if (navController.currentBackStackEntryAsState().value?.destination?.route != Screen.Notification.route) {
-                Icon(painterResource(R.drawable.ic_notifications),"",
-                    tint = WhiteColor,
-                    modifier = Modifier.clickable{
-                        navController.navigate(Screen.Notification.route)
-                    })
+                Box {
+                    Icon(painterResource(R.drawable.ic_notifications), "",
+                        tint = WhiteColor,
+                        modifier = Modifier.clickable {
+                            navController.navigate(Screen.Notification.route)
+                        })
+                    if (c > 0) {
+                            Text(
+                                if (c > 9) "9+" else c.toString(),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontSize = 9.sp,
+                                modifier = Modifier.background(RedColor, CircleShape).clip(
+                                    CircleShape).padding(1.dp).padding(horizontal = 3.dp).align(
+                                    Alignment.TopEnd),
+                                color = WhiteColor
+                            )
+                    }
+                }
                 Sp(w = 10.dp)
             }
 
@@ -184,6 +210,7 @@ fun NotesAppBar(
 @Composable
 fun FAQAppBar(
     title: String,
+    searchStr:String,
     resultCount: Int,
     navController: NavController,
     onTextChanged: (String) -> Unit
@@ -203,7 +230,7 @@ fun FAQAppBar(
 //            },
 //            backgroundColor = MainColor
 //        )
-        SearchBar(hint = "Search your doubts/questions here", onTextChanged = {
+        SearchBar(hint = "Search your doubts/questions here",searchStr, onTextChanged = {
             onTextChanged(it)
         })
         AnimatedVisibility(visible = resultCount != 0) {

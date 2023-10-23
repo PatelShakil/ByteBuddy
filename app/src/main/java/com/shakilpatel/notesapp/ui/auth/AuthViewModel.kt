@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
@@ -27,6 +28,16 @@ class AuthViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     private val context: Context
 ) : ViewModel() {
+
+    val notiCount = mutableIntStateOf(0)
+    init {
+        getUnreadNotiCount()
+    }
+    fun getUnreadNotiCount(uid: String = auth.uid.toString()){
+        commonRepo.getUnreadNotiCount(uid){
+            notiCount.intValue = it
+        }
+    }
 
 
     var eduList: Resource<List<EducationModel>>? = null

@@ -28,8 +28,20 @@ fun NavGraphBuilder.MainNav(navController: NavController, onBack: () -> Unit) {
         HomeNav(navController) {
             onBack()
         }
-        FeedNav(navController) {
-            onBack()
+
+//        FeedNav(navController){
+//            onBack()
+//        }
+        composable(Screen.Main.Feed.Landing.route + "/{faqId}",
+            arguments = listOf(
+                navArgument("faqId"){
+                    type= NavType.StringType
+                }
+            )
+        ) {
+            FeedScreen(it.arguments?.getString("faqId") ?: "", navController = navController) {
+                onBack()
+            }
         }
         CreateNav(navController) {
             onBack()
@@ -42,7 +54,7 @@ fun NavGraphBuilder.MainNav(navController: NavController, onBack: () -> Unit) {
 
 fun NavGraphBuilder.HomeNav(navController: NavController, onBack: () -> Unit) {
     navigation(
-        startDestination = Screen.Main.Home.Landing.route,
+        startDestination = Screen.Main.Home.Landing.route ,
         route = Screen.Main.Home.route
     ) {
         composable(Screen.Main.Home.Landing.route) {
@@ -117,11 +129,17 @@ fun NavGraphBuilder.ProfileNav(navController: NavController, onBack: () -> Unit)
 
 fun NavGraphBuilder.FeedNav(navController: NavController, onBack: () -> Unit) {
     navigation(
-        startDestination = Screen.Main.Feed.Landing.route,
+        startDestination = Screen.Main.Feed.Landing.route + "/${"#"}",
         route = Screen.Main.Feed.route
     ) {
-        composable(Screen.Main.Feed.Landing.route) {
-            FeedScreen(navController = navController) {
+        composable(Screen.Main.Feed.Landing.route + "/{faqId}",
+            arguments = listOf(
+                navArgument("faqId"){
+                    type= NavType.StringType
+                }
+            )
+        ) {
+            FeedScreen(it.arguments?.getString("faqId")!!, navController = navController) {
                 onBack()
             }
         }

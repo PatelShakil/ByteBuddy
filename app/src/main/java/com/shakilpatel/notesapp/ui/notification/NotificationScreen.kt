@@ -36,10 +36,12 @@ import com.shakilpatel.notesapp.common.uicomponents.ProgressBarCusIndicator
 import com.shakilpatel.notesapp.common.uicomponents.ProgressBarIndicator
 import com.shakilpatel.notesapp.common.uicomponents.Sp
 import com.shakilpatel.notesapp.data.models.user.NotificationModel
+import com.shakilpatel.notesapp.ui.main.home.notes.NotesViewModel
+import com.shakilpatel.notesapp.ui.nav.Screen
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 
 @Composable
-fun NotificationScreen(viewModel: NotificationViewModel,navController: NavController) {
+fun NotificationScreen(viewModel: NotificationViewModel,notesViewModel: NotesViewModel,navController: NavController) {
     ByteBuddyTheme {
 
         viewModel.notifications.collectAsState().value.let {
@@ -48,7 +50,7 @@ fun NotificationScreen(viewModel: NotificationViewModel,navController: NavContro
                     ProgressBarIndicator()
                 }
                 is Resource.Success ->{
-                    ListNotifications(list = it.result.sortedBy { it.date }.reversed(), viewModel = viewModel)
+                    ListNotifications(list = it.result.sortedBy { it.date }.reversed(), viewModel = viewModel, notesViewModel, navController)
                 }
                 is Resource.Failure ->{
                     OnNoDataFound(msg = it.errorMsgBody)
@@ -59,13 +61,13 @@ fun NotificationScreen(viewModel: NotificationViewModel,navController: NavContro
 }
 
 @Composable
-fun ListNotifications(list : List<NotificationModel>,viewModel: NotificationViewModel) {
+fun ListNotifications(list : List<NotificationModel>,viewModel: NotificationViewModel,notesViewModel: NotesViewModel,navController: NavController) {
     LazyColumn(modifier = Modifier.fillMaxWidth()){
         item{
             Sp(h = 10.dp)
         }
         items(list){
-            NotificationItem(data = it, viewModel = viewModel)
+            NotificationItem(data = it, viewModel = viewModel,notesViewModel,navController)
         }
         item{
             Sp(h = 100.dp)
@@ -75,14 +77,22 @@ fun ListNotifications(list : List<NotificationModel>,viewModel: NotificationView
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun NotificationItem(data : NotificationModel,viewModel: NotificationViewModel) {
+fun NotificationItem(data : NotificationModel, viewModel: NotificationViewModel, notesViewModel : NotesViewModel, navController: NavController) {
     Card(modifier = Modifier
         .fillMaxWidth()
         .padding(vertical = 2.dp)
         .clickable {
-            if(!data.read)
+            if (!data.read)
                 viewModel.markRead(id = data.id)
 
+            if (data.faq != "") {
+                navController.navigate(Screen.Main.Feed.Landing.route + "/${data.faq}")
+
+            } else if(data.notesId != "") {
+                notesViewModel.notesId.value = data.notesId
+                navController.navigate(Screen.ViewNotes.Landing.route + "/${data.notesId}")
+                notesViewModel.registerView(data.notesId)
+            }
         },
         colors = CardDefaults.cardColors(
             if(data.read)
@@ -97,7 +107,7 @@ fun NotificationItem(data : NotificationModel,viewModel: NotificationViewModel) 
             .padding(vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically){
             Sp(w=5.dp)
-            CircularImage(icon = if(data.faq == "") R.drawable.ic_notes else R.drawable.ic_feed,35.dp)
+            CircularImage(icon = if(data.faq != "") R.drawable.ic_feed else if(data.notesId != "") R.drawable.ic_notes else R.drawable.ic_notifications,35.dp)
             Sp( w = 5.dp)
             Column(modifier = Modifier){
                 FlowRow(modifier = Modifier.fillMaxWidth()){
