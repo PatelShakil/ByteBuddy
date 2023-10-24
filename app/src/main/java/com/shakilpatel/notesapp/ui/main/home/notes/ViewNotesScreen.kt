@@ -67,9 +67,6 @@ import com.easy.translator.EasyTranslator
 import com.easy.translator.LanguagesModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.rajat.pdfviewer.PdfViewerActivity
-import com.rizzi.bouquet.ResourceType
-import com.rizzi.bouquet.VerticalPDFReader
-import com.rizzi.bouquet.rememberVerticalPdfReaderState
 import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.HorizontalBrush
 import com.shakilpatel.notesapp.common.MainColor

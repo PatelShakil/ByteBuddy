@@ -52,26 +52,28 @@ class FirebaseService : FirebaseMessagingService() {
         super.onMessageReceived(message)
         Log.d("Msg", message.data.toString())
         val user = mutableStateOf(UserModel())
-        userRef.get().addOnSuccessListener {
-            if(it.exists()){
-                user.value = it.toObject(UserModel::class.java)!!
-                val notiList = user.value.notifications.toMutableList()
-                notiList.add(
-                    NotificationModel(
-                        Cons.generateRandomValue(9),
-                        message.data["title"] ?: "" .trim(),
-                        message.data["message"] ?: "" .trim(),
-                        message.data["faq"] ?: "",
-                        message.data["notesId"] ?: "",
-                        false,
-                        System.currentTimeMillis()
+        if(message.data["title"] != null || message.data["title"] != "") {
+            userRef.get().addOnSuccessListener {
+                if (it.exists()) {
+                    user.value = it.toObject(UserModel::class.java)!!
+                    val notiList = user.value.notifications.toMutableList()
+                    notiList.add(
+                        NotificationModel(
+                            Cons.generateRandomValue(9),
+                            message.data["title"] ?: "".trim(),
+                            message.data["message"] ?: "".trim(),
+                            message.data["faq"] ?: "",
+                            message.data["notesId"] ?: "",
+                            false,
+                            System.currentTimeMillis()
+                        )
                     )
-                )
-                user.value.notifications = notiList
-                userRef.set(user.value)
-                    .addOnSuccessListener {
-                        Log.d("Notification","Stored Successfully")
-                    }
+                    user.value.notifications = notiList
+                    userRef.set(user.value)
+                        .addOnSuccessListener {
+                            Log.d("Notification", "Stored Successfully")
+                        }
+                }
             }
         }
 
@@ -107,7 +109,6 @@ class FirebaseService : FirebaseMessagingService() {
                 .setSmallIcon(R.drawable.ic_notifications)
                 .setAutoCancel(true)
                 .setLargeIcon(BitmapFactory.decodeResource(applicationContext.resources, R.drawable.logo))
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(pendingIntent)
                 .build()
         }

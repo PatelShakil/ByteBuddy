@@ -28,17 +28,24 @@ class MyApplication : Application() {
         super.onCreate()
         context = applicationContext
         val db = FirebaseFirestore.getInstance()
-        val settings = firestoreSettings {
-            // Use memory cache
-            setLocalCacheSettings(memoryCacheSettings {
-            })
-            // Use persistent disk cache (default)
-            setLocalCacheSettings(persistentCacheSettings {
-            })
-        }
+//        Firebase.firestore.setPersistenceEnabled(true)
+//        val settings = firestoreSettings {
+//            // Use memory cache
+//            setLocalCacheSettings(memoryCacheSettings {
+//            })
+//            // Use persistent disk cache (default)
+//            setLocalCacheSettings(persistentCacheSettings {
+//            })
+//        }
+//        db.firestoreSettings = settings
+
+// The default cache size threshold is 100 MB. Configure "setCacheSizeBytes"
+// for a different threshold (minimum 1 MB) or set to "CACHE_SIZE_UNLIMITED"
+// to disable clean-up.
+        val settings = FirebaseFirestoreSettings.Builder()
+            .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+            .build()
         db.firestoreSettings = settings
-
-
         val scoresRef = Firebase.database.reference
         scoresRef.keepSynced(true)
         // Verbose Logging set to help debug issues, remove before releasing your app.

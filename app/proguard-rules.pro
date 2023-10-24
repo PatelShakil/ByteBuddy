@@ -11,6 +11,29 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keep class com.shakilpatel.notesapp.data.models.** { *; }
+-keep class com.shakilpatel.notesapp.common.MyApplication
+-keep class com.shakilpatel.notesapp.data.notification.** { *; }
+-keep class org.spongycastle.** { *; }
+-dontwarn org.spongycastle.**
+
+-keep class com.itextpdf.text.** { *; }
+-dontwarn com.itextpdf.text.**
+
+-keep class android.graphics.Bitmap.** {*;}
+-keep class com.itextpdf.** { *;}
+-keep class android.graphics.** {*;}
+
+
+-keep class dagger.** { *; }
+-keep class javax.inject.** { *; }
+-keep class javax.annotation.** { *; }
+-keep class dagger.hilt.** { *; }
+-keep class com.rajat.pdfviewer.** { *;}
+
+-keep class com.google.firebase.** { *; }
+-keepattributes Signature
+
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.

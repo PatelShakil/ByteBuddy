@@ -255,19 +255,7 @@ fun ErrorSSView(list: List<String>) {
     }
 }
 
-@Composable
-fun ESSCardItem(image: String, onClick: () -> Unit) {
-    Card(modifier = Modifier.size(100.dp)) {
-        if (image.isNotEmpty()) {
-            // Display the image
-            Image(
-                Cons.decodeImage(image).asImageBitmap(),
-                contentDescription = null, // Provide a meaningful description
-                contentScale = ContentScale.Crop
-            )
-        }
-    }
-}
+
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -313,24 +301,26 @@ fun CodeViewText(code: String) {
         modifier = Modifier
             .fillMaxWidth()
 //        .padding(horizontal = 10.dp)
-            .height(110.dp)
-            .verticalScroll(rememberScrollState())
+            .height(110.dp),
+        colors = CardDefaults.cardColors(
+            Color.Black
+        )
 
     ) {
         Box {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .height(110.dp)
-                    .background(Color.Black)
-                    .padding(10.dp),
-                text = code,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 12.sp,
-                color = Color.White,
-                softWrap = true
-            )
+            val codeLines = code.trim().split("\n")
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .horizontalScroll(rememberScrollState())
+                .background(Color.Black)
+                .padding(vertical = 10.dp)
+                .padding(start = 5.dp ,end = 5.dp)) {
+                codeLines.forEachIndexed { index, s ->
+                    CodeLine(lineNo = index + 1, codeLine = s)
+                }
+            }
+
             val context = LocalContext.current
             Icon(painterResource(id = R.drawable.ic_copy),"",
                 tint = WhiteColor,
@@ -357,70 +347,13 @@ fun CodeViewText(code: String) {
 }
 
 @Composable
-fun CodeView(code: String) {
-    val codeLines = code.trim().split("\n")
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .horizontalScroll(rememberScrollState())
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            for (line in codeLines) {
-                CodeLine(line)
-            }
-        }
-    }
-}
-
-@Composable
-fun CodeLine(line: String) {
-    val keywords = setOf("fun", "val", "var", "if", "else", "for", "while")
-
-    val operators = setOf("+", "-", "*", "/", "=", "==", "!=")
-    val fontFamily = FontFamily.Monospace
-
-    val annotatedString = AnnotatedString.Builder()
-    var currentPosition = 0
-
-    while (currentPosition < line.length) {
-        val word = getNextWord(line, currentPosition)
-        val style = when {
-            keywords.contains(word) -> SpanStyle(fontWeight = FontWeight.Bold, color = Color.Blue)
-            operators.contains(word) -> SpanStyle(color = Color.Green)
-            else -> SpanStyle(color = Color.Black)
-        }
-
-        annotatedString.append(
-            AnnotatedString(
-                text = word,
-                spanStyle = style
-            )
-        )
-
-        currentPosition += word.length
-    }
-
-    Box(
-        modifier = Modifier.padding(vertical = 2.dp),
-        content = {
-            Text(
-                text = annotatedString.toAnnotatedString(),
-                fontFamily = fontFamily,
-                fontSize = 12.sp
-            )
-        }
+fun CodeLine(lineNo:Int,codeLine : String) {
+    Text(
+        modifier = Modifier,
+        text = "$lineNo $codeLine",
+        fontFamily = FontFamily.Monospace,
+        fontSize = 12.sp,
+        color = Color.White,
+        softWrap = true
     )
-}
-
-
-fun getNextWord(line: String, currentPosition: Int): String {
-    var endPosition = currentPosition
-
-    while (endPosition < line.length && line[endPosition].isLetterOrDigit()) {
-        endPosition++
-    }
-
-    return line.substring(currentPosition, endPosition)
 }

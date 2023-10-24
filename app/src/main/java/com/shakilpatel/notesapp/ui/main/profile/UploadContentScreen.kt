@@ -123,8 +123,8 @@ fun UpNotesSampleScreen(
         notesList.value = it.notes
     }
     Column(modifier = Modifier.fillMaxSize()) {
-        if (user.value.saved.notes.isEmpty()) {
-            OnNoDataFound(msg = "No Such notes saved")
+        if (notesList.value.isEmpty()) {
+            OnNoDataFound(msg = "No Such notes you uploaded")
         }
         LazyVerticalGrid(modifier = Modifier
             .fillMaxSize()
