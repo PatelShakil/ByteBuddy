@@ -50,6 +50,7 @@ import com.shakilpatel.notesapp.common.HorizontalBrush
 import com.shakilpatel.notesapp.common.MainColor
 import com.shakilpatel.notesapp.common.WhiteColor
 import com.shakilpatel.notesapp.common.uicomponents.CircularImage
+import com.shakilpatel.notesapp.common.uicomponents.LinkifyText
 import com.shakilpatel.notesapp.common.uicomponents.Sp
 import com.shakilpatel.notesapp.data.models.admin.ContactsModel
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
@@ -81,7 +82,7 @@ fun AboutUsScreen(viewModel: ProfileViewModel) {
                     Text("Developed and Maintained by ")
                     Text("MuhammadShakil Patel", fontWeight = FontWeight.Bold)
                     Sp(10.dp)
-                    Text(
+                    LinkifyText(
                         viewModel.aboutMsg.value, style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier.fillMaxWidth(.9f),
                         textAlign = TextAlign.Center

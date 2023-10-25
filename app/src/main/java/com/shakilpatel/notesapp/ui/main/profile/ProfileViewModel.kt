@@ -122,7 +122,7 @@ class ProfileViewModel @Inject constructor(
             when (it) {
                 is Resource.Success -> {
                     _saved.value = it
-                    Log.d("Saved", _saved.value.toString())
+//                    Log.d("Saved", _saved.value.toString())
                 }
 
                 else -> {}

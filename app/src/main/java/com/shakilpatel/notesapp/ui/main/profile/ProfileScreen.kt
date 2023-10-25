@@ -1,5 +1,6 @@
 package com.shakilpatel.notesapp.ui.main.profile
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -310,6 +311,7 @@ fun EditProfileDialog(viewModel: ProfileViewModel, onDismiss: () -> Unit) {
                                 Sp(h = 20.dp)
                                 CustomOutlinedButton(label = "Update Profile") {
                                     curUser.profileImg = profileImage
+                                    Log.d("PRofile IMage",profileImage)
                                     viewModel.updateProfile(curUser)
                                     onDismiss()
                                 }

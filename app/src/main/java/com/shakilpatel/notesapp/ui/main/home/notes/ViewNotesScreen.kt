@@ -30,18 +30,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Tab
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,8 +50,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,7 +64,9 @@ import androidx.navigation.NavController
 import com.easy.translator.EasyTranslator
 import com.easy.translator.LanguagesModel
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.rajat.pdfviewer.PdfViewerActivity
+import com.shakilpatel.notesapp.common.tools.pdflib.ResourceType
+import com.shakilpatel.notesapp.common.tools.pdflib.VerticalPDFReader
+import com.shakilpatel.notesapp.common.tools.pdflib.rememberVerticalPdfReaderState
 import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.HorizontalBrush
 import com.shakilpatel.notesapp.common.MainColor
@@ -85,7 +85,6 @@ import com.shakilpatel.notesapp.common.uicomponents.TranslateDialog
 import com.shakilpatel.notesapp.data.models.learning.NotesModel
 import com.shakilpatel.notesapp.data.models.learning.NotesPage
 import com.shakilpatel.notesapp.ui.main.create.TabIndicator
-import com.shakilpatel.notesapp.ui.main.create.TabsContent
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 import kotlinx.coroutines.launch
 
@@ -94,50 +93,87 @@ fun ViewNotesScreen(notesId: String, viewModel: NotesViewModel, navController: N
     ByteBuddyTheme {
         Column {
             HideSystemBars()
-//            TabLayout(notesId, viewModel, navController)
-            var curState by remember{ mutableStateOf("Text") }
-            LaunchedEffect(key1 = true){
-                viewModel.getNote(notesId){
-                    viewModel.notes.value = it
-                }
-            }
-            viewModel.notes.collectAsState().value.let {
-                when (it) {
-                    is Resource.Success -> {
-                        viewModel.curNote.value = it.result
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 5.dp),
-                            horizontalArrangement = Arrangement.SpaceAround){
-                            CheckButton(title = "Text", isSelected = curState == "Text") {
-                                curState = "Text"
-                            }
-                            val context = LocalContext.current
-                            CheckButton(title = "PDF", isSelected = curState == "PDF") {
-                                context.startActivity(PdfViewerActivity.launchPdfFromUrl(
-                                    context,
-                                    it.result.pdfFile,
-                                    it.result.title,
-                                    "Downloads",
-                                    false
-                                ))
-                                curState = "Text"
-                            }
-
-                        }
-                        if(curState == "Text"){
-                            TextScreen(it.result,viewModel = viewModel)
-                        }
-                    }
-                    else -> {}
-                }
-            }
+            TabLayout(notesId, viewModel, navController)
+//            var curState by remember{ mutableStateOf("Text") }
+//            LaunchedEffect(key1 = true){
+//                viewModel.getNote(notesId){
+//                    viewModel.notes.value = it
+//                }
+//            }
+//            viewModel.notes.collectAsState().value.let {
+//                when (it) {
+//                    is Resource.Success -> {
+//                        viewModel.curNote.value = it.result
+//                        Row(modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(vertical = 5.dp),
+//                            horizontalArrangement = Arrangement.SpaceAround){
+//                            CheckButton(title = "Text", isSelected = curState == "Text") {
+//                                curState = "Text"
+//                            }
+//                            val context = LocalContext.current
+//                            CheckButton(title = "PDF", isSelected = curState == "PDF") {
+//                                context.startActivity(PdfViewerActivity.launchPdfFromUrl(
+//                                    context,
+//                                    it.result.pdfFile,
+//                                    it.result.title,
+//                                    "Downloads",
+//                                    false
+//                                ))
+//                                curState = "Text"
+//                            }
+//
+//                        }
+//                        if(curState == "Text"){
+//                            TextScreen(it.result,viewModel = viewModel)
+//                        }
+//                    }
+//                    else -> {}
+//                }
+//            }
 
 
         }
     }
 }
+@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
+@Composable
+fun TabLayout(notesId: String, viewModel: NotesViewModel, navController: NavController) {
+    val note = remember { mutableStateOf(NotesModel()) }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        viewModel.getNote(notesId) {
+            when (it) {
+                is Resource.Success -> {
+                    note.value = it.result
+                }
 
+                else -> {}
+            }
+
+        }
+        val pagerState = rememberPagerState(
+            initialPage = 0,
+            initialPageOffsetFraction = 0f
+        ) {
+            // provide pageCount
+            if (note.value.text.isEmpty()) 1 else 2
+        }
+        Column {
+            Tabs(
+                pagerState = pagerState, modifier = Modifier.height(40.dp),
+                if (note.value.text.isEmpty()) listOf("PDF")
+                else listOf("Text", "PDF")
+            )
+            Box(modifier = Modifier.fillMaxWidth()) {
+                TabsContent(pagerState = pagerState, viewModel, navController)
+            }
+
+        }
+    }
+}
 @Composable
 fun CheckButton(title:String,isSelected : Boolean, onClick:()->Unit) {
     Box(
@@ -231,7 +267,6 @@ fun Tabs(
         }
     }
 }
-/*
 
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalPagerApi
@@ -243,29 +278,28 @@ fun TabsContent(pagerState: PagerState, viewModel: NotesViewModel, navController
             is Resource.Success -> {
                 notes = it.result
                 viewModel.curNote.value = notes
-                when(pagerState.currentPage){
-                    0 -> {
-                        TextScreen(viewModel = viewModel)
 
-                    }
+                HorizontalPager(state = pagerState, userScrollEnabled = false) { page ->
+                    when (page) {
+                            0 -> {
+                                TextScreen(notes,viewModel = viewModel)
 
-                    1 -> {
-//                            PDFScreen(viewModel = viewModel, navController)
-                        val context = LocalContext.current
-                        context.startActivity(PdfViewerActivity.launchPdfFromUrl(
-                            context,
-                            notes.pdfFile,
-                            notes.title,
-                            "Downloads",
-                            false
-                        ))
+                            }
+
+                            1 -> {
+                                PDFScreen(viewModel = viewModel, navController)
+//                        val context = LocalContext.current
+//                        context.startActivity(PdfViewerActivity.launchPdfFromUrl(
+//                            context,
+//                            notes.pdfFile,
+//                            notes.title,
+//                            "Downloads",
+//                            false
+//                        ))
+                            }
+
                     }
                 }
-//                HorizontalPager(state = pagerState, userScrollEnabled = false) { page ->
-//                    when (page) {
-//
-//                    }
-//                }
             }
 
             else -> {}
@@ -273,7 +307,6 @@ fun TabsContent(pagerState: PagerState, viewModel: NotesViewModel, navController
     }
 
 }
-*/
 
 /*
 class RetrievePDFfromUrl() : AsyncTask<String, Void, InputStream>() {
@@ -318,7 +351,6 @@ class RetrievePDFfromUrl() : AsyncTask<String, Void, InputStream>() {
 }
 */
 
-/*
 @Composable
 fun PDFScreen(viewModel: NotesViewModel, navController: NavController) {
 
@@ -392,7 +424,6 @@ fun PDFScreen(viewModel: NotesViewModel, navController: NavController) {
         }
     }
 }
-*/
 
 
 @Composable

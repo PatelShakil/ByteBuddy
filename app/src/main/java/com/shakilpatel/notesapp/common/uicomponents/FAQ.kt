@@ -155,7 +155,7 @@ fun FAQItem(
                 var isDescExpand by remember { mutableStateOf(false) }
                 if (isDescExpand) {
                     faq.description.lines().forEach {
-                        Text(
+                        LinkifyText(
                             it,
                             style = MaterialTheme.typography.bodySmall,
                             fontSize = 12.sp,
@@ -165,7 +165,7 @@ fun FAQItem(
                     }
                 } else {
                     faq.description.lines().take(5).forEach {
-                        Text(
+                        LinkifyText(
                             it,
                             style = MaterialTheme.typography.bodySmall,
                             fontSize = 12.sp,
@@ -479,7 +479,7 @@ fun FAQAnsItem(ans: FAQAnsModel, viewModel: FAQViewModel) {
                         Text(user.name, fontSize = 10.sp, modifier = Modifier.weight(.6f))
                         Text(Cons.convertLongToDate(ans.date, "hh:mma dd/MMM"), fontSize = 8.sp)
                     }
-                    Text(ans.message, style = MaterialTheme.typography.bodySmall)
+                    LinkifyText(ans.message, style = MaterialTheme.typography.bodySmall)
 
                 }
             }

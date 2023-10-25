@@ -7,6 +7,7 @@ plugins {
     id ("dagger.hilt.android.plugin")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -17,7 +18,7 @@ android {
         applicationId = "com.shakilpatel.notesapp"
         minSdk = 24
         targetSdk = 33
-        versionCode = 2
+        versionCode = 3
         versionName = "2.0 Ultimate"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -100,13 +101,16 @@ dependencies {
     implementation ("net.engawapg.lib:zoomable:1.5.1")
 
     // Paging Compose
-    implementation ("com.google.accompanist:accompanist-pager:0.13.0")
     implementation ("com.google.accompanist:accompanist-pager-indicators:0.13.0")
 
     //pdf reader
-    implementation("com.github.afreakyelf:Pdf-Viewer:v1.1.2")
+//    implementation("com.github.afreakyelf:Pdf-Viewer:v1.1.2")
 //    implementation ("io.github.grizzi91:bouquet:1.1.2")
     implementation ("com.itextpdf:itextg:5.5.10")
+    implementation("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
+//    implementation("es.voghdev.pdfviewpager:library:1.1.2")
+//    implementation("es.voghdev.pdfviewpager:library:1.0.6")
 
 
     //translate
