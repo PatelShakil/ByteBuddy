@@ -75,6 +75,8 @@ import com.shakilpatel.notesapp.common.TextColor
 import com.shakilpatel.notesapp.common.WhiteColor
 import com.shakilpatel.notesapp.common.getHorizontalGradient
 import com.shakilpatel.notesapp.common.getVerticalGradient
+import com.shakilpatel.notesapp.common.tools.pdflib.HorizontalPDFReader
+import com.shakilpatel.notesapp.common.tools.pdflib.rememberHorizontalPdfReaderState
 import com.shakilpatel.notesapp.common.uicomponents.ConfirmationDialog
 import com.shakilpatel.notesapp.common.uicomponents.OnNoDataFound
 import com.shakilpatel.notesapp.common.uicomponents.ProgressBarCus
@@ -355,10 +357,8 @@ class RetrievePDFfromUrl() : AsyncTask<String, Void, InputStream>() {
 fun PDFScreen(viewModel: NotesViewModel, navController: NavController) {
 
     val notes = viewModel.curNote.value
-    val pdfState = rememberVerticalPdfReaderState(
-        resource = ResourceType.Remote(notes.pdfFile),
-        isZoomEnable = true
-    )
+    val pdfState = rememberHorizontalPdfReaderState(resource = ResourceType.Remote(notes.pdfFile),
+        isZoomEnable = true)
     if (pdfState.error != null)
         SnackBarCus(msg = pdfState.error!!.localizedMessage)
     Log.d("Percent", pdfState.loadPercent.toString())
@@ -401,7 +401,7 @@ fun PDFScreen(viewModel: NotesViewModel, navController: NavController) {
             pdfState.changeZoomState(true)
 
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    VerticalPDFReader(
+                    HorizontalPDFReader(
                         state = pdfState,
                         modifier = Modifier
                             .fillMaxSize()

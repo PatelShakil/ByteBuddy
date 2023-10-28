@@ -3,6 +3,7 @@ package com.shakilpatel.notesapp.common.tools.pdflib
 import android.content.Context
 import android.os.ParcelFileDescriptor
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.scrollBy
@@ -160,11 +161,14 @@ fun HorizontalPDFReader(
                 state.close()
             }
         }
+        val zoomState = rememberZoomState()
         state.pdfRender?.let { pdf ->
             HorizontalPager(
                 modifier = Modifier
                     .fillMaxSize()
-                    .tapToZoomHorizontal(state, constraints),
+//                    .tapToZoomHorizontal(state, constraints)
+                    .zoomable(zoomState)
+                ,
                 count = state.pdfPageCount,
                 state = state.pagerState,
                 userScrollEnabled = state.scale == 1f
@@ -178,10 +182,25 @@ fun HorizontalPDFReader(
                 }
                 when (pageContent) {
                     is PageContentInt.PageContent -> {
-                        PdfImage(
-                            bitmap = { pageContent.bitmap.asImageBitmap() },
-                            contentDescription = pageContent.contentDescription
-                        )
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            PdfImage(
+                                bitmap = { pageContent.bitmap.asImageBitmap() },
+                                contentDescription = pageContent.contentDescription
+                            )
+                            Card(modifier = Modifier
+//                                    .background(HorizontalBrush)
+                                .align(Alignment.TopStart)
+                                .padding(start = 10.dp, top = 5.dp)){
+                                Text("${page + 1} of ${pdf.pageCount}",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier
+                                        .background(HorizontalBrush, RoundedCornerShape(15.dp))
+                                        .padding(2.dp)
+                                        .padding(horizontal = 5.dp)
+                                    ,
+                                    fontFamily = FontFamily.SansSerif)
+                            }
+                        }
                     }
 
                     is PageContentInt.BlankPage -> BlackPage(

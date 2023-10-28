@@ -1,11 +1,15 @@
 package com.shakilpatel.notesapp.common.tools.pdflib
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import com.shakilpatel.notesapp.common.MainColor
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
@@ -17,9 +21,9 @@ internal fun PdfImage(
     Image(
         bitmap = bitmap(),
         contentDescription = contentDescription,
-        contentScale = ContentScale.FillWidth,
+        contentScale = ContentScale.Fit,
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize(),
 //            .zoomable(rememberZoomState())
     )
 
