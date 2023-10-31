@@ -357,7 +357,7 @@ class RetrievePDFfromUrl() : AsyncTask<String, Void, InputStream>() {
 fun PDFScreen(viewModel: NotesViewModel, navController: NavController) {
 
     val notes = viewModel.curNote.value
-    val pdfState = rememberHorizontalPdfReaderState(resource = ResourceType.Remote(notes.pdfFile),
+    val pdfState = rememberVerticalPdfReaderState(resource = ResourceType.Remote(notes.pdfFile),
         isZoomEnable = true)
     if (pdfState.error != null)
         SnackBarCus(msg = pdfState.error!!.localizedMessage)
@@ -401,7 +401,7 @@ fun PDFScreen(viewModel: NotesViewModel, navController: NavController) {
             pdfState.changeZoomState(true)
 
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    HorizontalPDFReader(
+                    VerticalPDFReader(
                         state = pdfState,
                         modifier = Modifier
                             .fillMaxSize()
