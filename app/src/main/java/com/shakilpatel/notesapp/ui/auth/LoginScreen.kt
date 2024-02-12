@@ -75,9 +75,10 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController, onBack: 
                 Sp(h = 50.dp)
                 SignupTextField(value = email, label = "Email", onTextChanged = {
                     email = it
-                })
+                },
+                    keyboardType = KeyboardType.Email)
                 SignupTextField(
-                    value = pass, label = "Password", onTextChanged = {
+                    label = "Password", onTextChanged = {
                         pass = it
                     },
                     keyboardType = KeyboardType.Password

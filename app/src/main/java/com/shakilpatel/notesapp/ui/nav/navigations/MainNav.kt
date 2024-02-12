@@ -49,6 +49,9 @@ fun NavGraphBuilder.MainNav(navController: NavController, onBack: () -> Unit) {
         ProfileNav(navController) {
             onBack()
         }
+        ChatNav(navController){
+            onBack()
+        }
     }
 }
 

@@ -65,10 +65,11 @@ class MyApplication : Application() {
     private fun setupActivityListener() {
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                activity.window.setFlags(
-                    WindowManager.LayoutParams.FLAG_SECURE,
-                    WindowManager.LayoutParams.FLAG_SECURE
-                )
+                /*TODO MAKE THIS FLAGS ENABLE TO SECURE APP FROM TAKING SCREENSHOT AND SCREENCAST*/
+//                activity.window.setFlags(
+//                    WindowManager.LayoutParams.FLAG_SECURE,
+//                    WindowManager.LayoutParams.FLAG_SECURE
+//                )
             }
 
             override fun onActivityStarted(activity: Activity) {}

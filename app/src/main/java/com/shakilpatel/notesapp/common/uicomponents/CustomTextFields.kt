@@ -55,7 +55,7 @@ fun CustomTextField(
 @Composable
 fun SignupTextField(
     modifier: Modifier = Modifier,
-    value: String,
+    value: String = "",
     label: String,
     hint: String = "",
     onTextChanged: (String) -> Unit,
@@ -76,11 +76,11 @@ fun SignupTextField(
             focusedBorderColor = MainColor,
             cursorColor = MainColor
         ),
-        keyboardActions = KeyboardActions {
+        singleLine = true,
 
-        }
     )
 }
+
 
 @Composable
 fun ProfileTextField(

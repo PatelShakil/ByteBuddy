@@ -107,11 +107,38 @@ fun CusAppBar(navController: NavController, viewModel: AuthViewModel) {
             DefaultAppBar(title = title, navController = navController, viewModel = viewModel)
 
         }
+        Screen.Main.Chat.Landing.route->{
+            ChatHomeAppBar(navController)
+        }
 
         else -> {
         }
     }
 }
+
+@Composable
+fun ChatHomeAppBar(navController: NavController) {
+    TopAppBar(
+        modifier = Modifier.height(40.dp), title = {
+            Text(
+                "Chats",
+                style = MaterialTheme.typography.titleLarge,
+                color = AppBarTextColor
+            )
+        },
+        navigationIcon = {
+            Sp(w = 10.dp)
+            if (navController.currentBackStackEntryAsState().value?.destination?.route != Screen.Main.Home.Landing.route) {
+                Icon(Icons.Default.ArrowBack, "", tint = White,
+                    modifier = Modifier.clickable {
+                        navController.popBackStack()
+                    })
+            }
+        },
+        backgroundColor = MainColor
+    )
+}
+
 
 @Composable
 fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthViewModel) {
@@ -155,9 +182,16 @@ fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthVi
                                 if (c > 9) "9+" else c.toString(),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontSize = 9.sp,
-                                modifier = Modifier.background(RedColor, CircleShape).clip(
-                                    CircleShape).padding(1.dp).padding(horizontal = 3.dp).align(
-                                    Alignment.TopEnd),
+                                modifier = Modifier
+                                    .background(RedColor, CircleShape)
+                                    .clip(
+                                        CircleShape
+                                    )
+                                    .padding(1.dp)
+                                    .padding(horizontal = 3.dp)
+                                    .align(
+                                        Alignment.TopEnd
+                                    ),
                                 color = WhiteColor
                             )
                     }

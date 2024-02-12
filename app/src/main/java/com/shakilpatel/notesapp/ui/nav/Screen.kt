@@ -29,6 +29,12 @@ sealed class Screen(val route: String, var title: String = "") {
             object Uploaded : Screen("profile_uploaded", "Uploads")
             object AboutUs : Screen("profile_aboutus","About Us")
         }
+
+        object Chat : Screen("chat"){
+            object Landing : Screen("chat_landing","Chats")
+
+            object ChatUser : Screen("chat_user")
+        }
     }
 
     object ViewNotes : Screen("view_notes") {

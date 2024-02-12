@@ -54,6 +54,12 @@ sealed class BottomBarScreen(
         icon = R.drawable.ic_home,
         icon_focused = R.drawable.ic_home
     )
+    object Chat : BottomBarScreen(
+        route = Screen.Main.Chat.route,
+        title = "Chats",
+        icon = R.drawable.ic_message_old,
+        icon_focused = R.drawable.ic_message_old
+    )
 
     // for report
     object Feed : BottomBarScreen(
@@ -87,6 +93,7 @@ fun BadgeBottomNavigation(navController: NavController, viewModel: AuthViewModel
         BottomBarScreen.Home,
         BottomBarScreen.Feed,
         BottomBarScreen.Create,
+        BottomBarScreen.Chat,
         BottomBarScreen.Profile
     )
 
@@ -95,7 +102,7 @@ fun BadgeBottomNavigation(navController: NavController, viewModel: AuthViewModel
 
     Row(
         modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 8.dp, bottom = 8.dp)
+            .padding(start = 5.dp, end = 5.dp, top = 8.dp, bottom = 8.dp)
             .background(Color.Transparent)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
