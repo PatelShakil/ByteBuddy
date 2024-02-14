@@ -108,7 +108,7 @@ fun CusAppBar(navController: NavController, viewModel: AuthViewModel) {
 
         }
         Screen.Main.Chat.Landing.route->{
-            ChatHomeAppBar(navController)
+//            ChatHomeAppBar(navController)
         }
 
         else -> {

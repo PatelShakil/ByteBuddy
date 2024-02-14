@@ -16,11 +16,17 @@ import android.os.Build
 import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -28,11 +34,24 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.Random
+@Composable
+inline fun <reified VM : ViewModel> NavController.getViewModelInstance(navBackStackEntry: NavBackStackEntry, route: String): VM {
+    val parentEntry = getParent(navBackStackEntry, route)
+    return hiltViewModel(parentEntry)
+}
 
+@Composable
+fun NavController.getParent(navBackStackEntry: NavBackStackEntry, route: String): NavBackStackEntry {
+    val parentEntry = remember(navBackStackEntry) {
+        this.getBackStackEntry(route)
+    }
+    return parentEntry
+}
 
 class Cons() {
     companion object {
         const val USERS = "users"
+
         fun isInternetConnected(context: Context): Boolean {
             val connectivityManager =
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

@@ -34,6 +34,7 @@ sealed class Screen(val route: String, var title: String = "") {
             object Landing : Screen("chat_landing","Chats")
 
             object ChatUser : Screen("chat_user")
+            object AddChatUser : Screen("add_chat_user")
         }
     }
 
