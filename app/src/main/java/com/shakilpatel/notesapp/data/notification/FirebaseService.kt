@@ -105,8 +105,8 @@ class FirebaseService : FirebaseMessagingService() {
         }
         var notification: Notification? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notification = if(message.data["ismsg"].toString() == "false") {
-                Notification.Builder(this, CHANNEL_ID)
+            if(message.data["ismsg"].toString() == "false") {
+                notification = Notification.Builder(this, CHANNEL_ID)
                     .setContentTitle(message.data["title"])
                     .setContentText(message.data["message"])
                     .setSmallIcon(R.drawable.ic_notifications)
@@ -119,28 +119,37 @@ class FirebaseService : FirebaseMessagingService() {
                     )
                     .setContentIntent(pendingIntent)
                     .build()
+                checkUserIsOnline(FirebaseAuth.getInstance().uid.toString()){
+                    if(!it){
+                        manager.notify(notificationId, notification)
+                    }
+                }
             }else{
-                Notification.Builder(this,CHANNEL_ID)
-                    .setContentTitle(message.data["title"] + " sent you a message")
-                    .setContentText(message.data["message"])
-                    .setSmallIcon(R.drawable.ic_notifications)
-                    .setAutoCancel(true)
-                    .setLargeIcon(
-                        if(message.data["image"]?.toString() == "") {BitmapFactory.decodeResource(
-                            applicationContext.resources,
-                            R.drawable.ic_profile_round_img
-                        )} else Cons.decodeImage(message.data["image"].toString())
-                    )
-                    .setContentIntent(pendingIntent)
-                    .build()
+                FirebaseFirestore.getInstance().collection("users")
+                    .document(message.data["uid"].toString())
+                    .get()
+                    .addOnSuccessListener {
+                        val user = it.toObject(UserModel::class.java)!!
+                        notification = Notification.Builder(this,CHANNEL_ID)
+                            .setContentTitle(user.name + " sent you a message")
+                            .setContentText(message.data["message"])
+                            .setSmallIcon(R.drawable.ic_notifications)
+                            .setAutoCancel(true)
+                            .setLargeIcon(
+                                if(user.profileImg.isNullOrEmpty()) {BitmapFactory.decodeResource(
+                                    applicationContext.resources,
+                                    R.drawable.ic_profile_round_img
+                                )} else Cons.decodeImage(user.profileImg ?: "")
+                            )
+                            .setContentIntent(pendingIntent)
+                            .build()
+                        manager.notify(notificationId,notification)
+
+                    }
+
             }
         }
-        manager.notify(notificationId,notification)
-        checkUserIsOnline(FirebaseAuth.getInstance().uid.toString()){
-            if(!it){
-                manager.notify(notificationId, notification)
-            }
-        }
+
     }
     fun checkUserIsOnline(uid: String, onResult: (Boolean) -> Unit) {
         FirebaseFirestore.getInstance().collection("users")

@@ -92,6 +92,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.shakilpatel.notesapp.common.Cons
 import com.shakilpatel.notesapp.common.LightColor
 import com.shakilpatel.notesapp.common.MainColor
@@ -322,10 +323,11 @@ fun ChatDetailScreen(viewModel: ChatViewModel, navController: NavController) {
                                                     "Someone",
                                                     msg,
                                                     time = System.currentTimeMillis(),
-                                                    image =  "",
-                                                    uid = receiverUser.uid
+                                                    uid = FirebaseAuth.getInstance().uid!!,
+
                                                 ),
                                                 receiverUser.token,
+                                                ismsg = true
                                             )
                                         )
 

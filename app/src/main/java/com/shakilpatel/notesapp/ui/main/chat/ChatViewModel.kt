@@ -135,7 +135,8 @@ class ChatViewModel @Inject constructor(
         _connectedUsers.value = Resource.Loading
         try {
             db.collection("chats")
-                .whereEqualTo("senderId", uid)
+                .where(Filter.or(Filter.equalTo("senderId", uid), Filter.equalTo("receiverId", uid)))
+//                .whereEqualTo("senderId", uid)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         _connectedUsers.value =

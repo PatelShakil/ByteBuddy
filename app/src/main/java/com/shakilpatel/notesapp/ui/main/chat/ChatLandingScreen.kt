@@ -82,8 +82,8 @@ fun ChatLandingScreen(viewModel: ChatViewModel,navController: NavController,onBa
                                 modifier =Modifier.fillMaxSize()
                             ){
                                 val users = Random.nextInt(from = 2, until = 20)
-                                val width = Random.nextInt(from = 120, until = 300)
                                 repeat(users){
+                                    val width = Random.nextInt(from = 120, until = 300)
                                     Row(
                                         modifier = Modifier.fillMaxWidth()
                                             .padding(horizontal = 5.dp, vertical = 3.dp)
@@ -151,7 +151,7 @@ fun ChatLandingScreen(viewModel: ChatViewModel,navController: NavController,onBa
 
                                         }
                                     }
-                                    if(filterList.isEmpty()){
+                                    if(filterList.isEmpty() && baseList.isNotEmpty()){
                                         OnNoDataFound(msg = "No user found")
                                     }
                                     filterList.sortedBy {  it.second.lastMsgTime}.reversed().forEachIndexed { index, pair ->
