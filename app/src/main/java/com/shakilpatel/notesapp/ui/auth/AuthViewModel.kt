@@ -30,6 +30,12 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
 
     val notiCount = mutableIntStateOf(0)
+
+    private val _loginResult = MutableStateFlow<Resource<Boolean>?>(null)
+    val loginResult = _loginResult
+
+    private val _signupResult = MutableStateFlow<Resource<Boolean>?>(null)
+    val signupResult = _signupResult
     init {
         getUnreadNotiCount()
     }
@@ -107,6 +113,12 @@ class AuthViewModel @Inject constructor(
     }
 
     //login
+    fun login(email: String, pass: String) {
+        _loginResult.value = Resource.Loading
+        authRepo.doLogin(email,pass){
+            _loginResult.value = it
+        }
+    }
     fun doLogin(email: String, pass: String, navController: NavController) {
         authRepo.doLogin(email, pass) { login ->
             when (login) {
@@ -165,24 +177,11 @@ class AuthViewModel @Inject constructor(
     }
     //signup
 
-    fun doSignup(user: UserModel, navController: NavController) {
+    fun doSignup(user: UserModel,pass: String, navController: NavController) {
+        _signupResult.value = Resource.Loading
         user.uid = auth.uid.toString()
-        authRepo.doSignup(user) {
-            when (val it = it) {
-                is Resource.Failure -> {
-                    Log.d("Error Signup", it.errorMsgBody)
-                    Toast.makeText(context, it.errorMsgBody, Toast.LENGTH_SHORT).show()
-
-                }
-
-                is Resource.Success -> {
-                    if (it.result) {
-                        navController.navigate(Screen.Main.route)
-                    }
-                }
-
-                else -> {}
-            }
+        authRepo.doSignup(user,pass) {
+            _signupResult.value = it
         }
     }
 

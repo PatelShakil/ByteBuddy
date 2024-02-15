@@ -33,6 +33,7 @@ import com.shakilpatel.notesapp.ui.nav.navigations.AuthNav
 import com.shakilpatel.notesapp.ui.nav.navigations.MainNav
 import com.shakilpatel.notesapp.ui.nav.navigations.NotiNav
 import com.shakilpatel.notesapp.ui.notification.NotificationScreen
+import com.shakilpatel.notesapp.ui.splash.SplashScreen
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 
 @Composable
@@ -105,8 +106,13 @@ fun NotesAppNavHost(onBack: () -> Unit) {
             NavHost(
                 modifier = Modifier.padding(it),
                 navController = navController,
-                startDestination = Screen.Auth.route
+                startDestination = Screen.Splash.route
             ) {
+                composable(
+                    Screen.Splash.route
+                ){
+                    SplashScreen(viewModel = hiltViewModel(), navController = navController)
+                }
                 AuthNav(navController) {
                     onBack()
                 }

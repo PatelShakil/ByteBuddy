@@ -23,15 +23,9 @@ fun NavGraphBuilder.AuthNav(navController: NavController, onBack: () -> Unit) {
                 onBack()
             }
         }
-        composable(Screen.Auth.Signup.route + "/{email}",
-            arguments = listOf(
-                navArgument("email") {
-                    type = NavType.StringType
-                }
-            )
+        composable(Screen.Auth.Signup.route ,
         ) {
             SignupScreen(
-                email = it.arguments?.getString("email")!!,
                 viewModel = it.sharedViewModel<AuthViewModel>(navController = navController),
                 navController
             )

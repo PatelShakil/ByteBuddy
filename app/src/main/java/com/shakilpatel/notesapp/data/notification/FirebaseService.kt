@@ -105,7 +105,30 @@ class FirebaseService : FirebaseMessagingService() {
         }
         var notification: Notification? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if(message.data["ismsg"].toString() == "false") {
+            if(message.data["type"].toString() == "msg") {
+                FirebaseFirestore.getInstance().collection("users")
+                .document(message.data["uid"].toString())
+                .get()
+                .addOnSuccessListener {
+                    val user = it.toObject(UserModel::class.java)!!
+                    notification = Notification.Builder(this,CHANNEL_ID)
+                        .setContentTitle(user.name + " sent you a message")
+                        .setContentText(message.data["message"])
+                        .setSmallIcon(R.drawable.ic_notifications)
+                        .setAutoCancel(true)
+                        .setLargeIcon(
+                            if(user.profileImg.isNullOrEmpty()) {BitmapFactory.decodeResource(
+                                applicationContext.resources,
+                                R.drawable.ic_profile_round_img
+                            )} else Cons.decodeImage(user.profileImg ?: "")
+                        )
+                        .setContentIntent(pendingIntent)
+                        .build()
+                    manager.notify(notificationId,notification)
+
+                }
+            }else{
+
                 notification = Notification.Builder(this, CHANNEL_ID)
                     .setContentTitle(message.data["title"])
                     .setContentText(message.data["message"])
@@ -124,28 +147,6 @@ class FirebaseService : FirebaseMessagingService() {
                         manager.notify(notificationId, notification)
                     }
                 }
-            }else{
-                FirebaseFirestore.getInstance().collection("users")
-                    .document(message.data["uid"].toString())
-                    .get()
-                    .addOnSuccessListener {
-                        val user = it.toObject(UserModel::class.java)!!
-                        notification = Notification.Builder(this,CHANNEL_ID)
-                            .setContentTitle(user.name + " sent you a message")
-                            .setContentText(message.data["message"])
-                            .setSmallIcon(R.drawable.ic_notifications)
-                            .setAutoCancel(true)
-                            .setLargeIcon(
-                                if(user.profileImg.isNullOrEmpty()) {BitmapFactory.decodeResource(
-                                    applicationContext.resources,
-                                    R.drawable.ic_profile_round_img
-                                )} else Cons.decodeImage(user.profileImg ?: "")
-                            )
-                            .setContentIntent(pendingIntent)
-                            .build()
-                        manager.notify(notificationId,notification)
-
-                    }
 
             }
         }

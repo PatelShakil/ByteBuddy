@@ -42,6 +42,7 @@ sealed class Screen(val route: String, var title: String = "") {
         object Landing : Screen("view_notes_landing")
     }
 
+    object Splash : Screen("splash")
     object UsersProfile : Screen("users_profile")
     object Notification : Screen("notification","Notification")
 }

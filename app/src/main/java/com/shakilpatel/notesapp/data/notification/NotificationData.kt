@@ -6,6 +6,6 @@ data class NotificationData(
     var notesId: String = "",
     var faq: String = "",
     var time: Long = System.currentTimeMillis(),
-    var image: String = "",
     var uid: String = "",
+    var type: String = "",
 )

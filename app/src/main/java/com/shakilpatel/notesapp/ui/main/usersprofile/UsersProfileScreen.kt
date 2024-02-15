@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -117,8 +118,8 @@ fun UsersProfileScreen(uid : String,viewModel: UsersProfileViewModel,navControll
                                     ProfileTextFieldDisabled(
                                         label = "College", value = curUser.college.name
                                     )
-                                    Sp(h = 5.dp)
-                                    ProfileTextFieldDisabled(label = "DOB", value = curUser.dob)
+//                                    Sp(h = 5.dp)
+//                                    ProfileTextFieldDisabled(label = "DOB", value = curUser.dob)
                                     Sp(h = 30.dp)
                                 }
                             }

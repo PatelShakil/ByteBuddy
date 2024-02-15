@@ -168,7 +168,8 @@ class ErrorRepo @Inject constructor(
                                     "",
                                     error.id
                                 ),
-                                Cons.TOPIC_ALL
+                                Cons.TOPIC_ALL,
+                                ismsg = "false"
                             )
                         )
                     }
@@ -266,7 +267,8 @@ class ErrorRepo @Inject constructor(
                                                 "",
                                                 faqModel.id
                                             ),
-                                            token
+                                            token,
+                                            ismsg = "false"
                                         )
                                     )
                                 }

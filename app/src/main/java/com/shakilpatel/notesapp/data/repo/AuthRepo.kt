@@ -106,24 +106,37 @@ class AuthRepo @Inject constructor(
             }
     }
 
-    fun doSignup(user: UserModel, signupResultCallback: (Resource<Boolean>) -> Unit) {
-        db.collection("users")
-            .document(user.uid)
-            .set(user)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    signupResultCallback(Resource.Success(true))
-                } else {
-                    signupResultCallback(Resource.Success(false))
+    fun doSignup(user: UserModel,pass: String, signupResultCallback: (Resource<Boolean>) -> Unit) {
+        auth.createUserWithEmailAndPassword(user.email, pass)
+            .addOnSuccessListener {
+                if(it.user != null) {
+                    db.collection("users")
+                        .document(user.uid)
+                        .set(user)
+                        .addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                signupResultCallback(Resource.Success(true))
+                            } else {
+                                signupResultCallback(Resource.Success(false))
+                            }
+                            if (it.exception != null) {
+                                signupResultCallback(
+                                    Resource.Failure(
+                                        it.exception!!,
+                                        it.exception!!.localizedMessage
+                                    )
+                                )
+                            }
+                        }
                 }
-                if (it.exception != null) {
-                    signupResultCallback(
-                        Resource.Failure(
-                            it.exception!!,
-                            it.exception!!.localizedMessage
-                        )
+            }
+            .addOnFailureListener {
+                signupResultCallback(
+                    Resource.Failure(
+                        it,
+                        it.localizedMessage
                     )
-                }
+                )
             }
     }
 }

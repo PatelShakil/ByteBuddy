@@ -311,9 +311,10 @@ fun ChatDetailScreen(viewModel: ChatViewModel, navController: NavController) {
                                                         msg,
                                                         time = System.currentTimeMillis(),
                                                         uid = FirebaseAuth.getInstance().uid!!,
+                                                        type = "msg"
                                                         ),
                                                     receiverUser.token,
-                                                    ismsg = true
+                                                    ismsg = "true"
                                                 )
                                             )
                                         }
@@ -539,12 +540,15 @@ fun TopBarChatDetail(modifier: Modifier = Modifier, user: UserModel, navControll
                     .padding(top = 5.dp, bottom = 5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Sp(w = 5.dp)
-                CircularImage(
-                    size = 50.dp,
-                    image = user.profileImg ?: ""
-                ) {
 
+                if(!user.profileImg.isNullOrEmpty()) {
+                    Sp(w = 5.dp)
+                    CircularImage(
+                        size = 50.dp,
+                        image = user.profileImg ?: ""
+                    ) {
+
+                    }
                 }
                 Sp(w = 10.dp)
                 Column(Modifier.weight(.1f)) {

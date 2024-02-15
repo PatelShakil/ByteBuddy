@@ -165,7 +165,7 @@ fun SignupTextField(
             onTextChanged(it)
             tf = it
         },
-        modifier = modifier.fillMaxWidth(.95f).padding(10.dp),
+        modifier = modifier.fillMaxWidth(.95f).padding(horizontal = 10.dp),
         placeholder = { Text(hint, style = MaterialTheme.typography.bodySmall) },
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         visualTransformation = if (keyboardType == KeyboardType.Password) PasswordVisualTransformation() else VisualTransformation.None, // Handle password input

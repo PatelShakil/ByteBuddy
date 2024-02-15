@@ -1,13 +1,16 @@
 package com.shakilpatel.notesapp.ui.auth
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,27 +41,31 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.Cons
 import com.shakilpatel.notesapp.common.HorizontalBrush
 import com.shakilpatel.notesapp.common.MainColor
+import com.shakilpatel.notesapp.common.Resource
 import com.shakilpatel.notesapp.common.WhiteColor
 import com.shakilpatel.notesapp.common.tools.rememberGetContentContractLauncher
 import com.shakilpatel.notesapp.common.uicomponents.CusDropdown
 import com.shakilpatel.notesapp.common.uicomponents.CustomOutlinedButton
 import com.shakilpatel.notesapp.common.uicomponents.DatePickerDialogCustom
+import com.shakilpatel.notesapp.common.uicomponents.ProgressBarCus
 import com.shakilpatel.notesapp.common.uicomponents.SignupTextField
 import com.shakilpatel.notesapp.common.uicomponents.Sp
 import com.shakilpatel.notesapp.data.models.learning.CollegeModel
 import com.shakilpatel.notesapp.data.models.learning.EducationModel
 import com.shakilpatel.notesapp.data.models.user.SavedModel
 import com.shakilpatel.notesapp.data.models.user.UserModel
+import com.shakilpatel.notesapp.ui.nav.Screen
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 
 @Composable
-fun SignupScreen(email: String, viewModel: AuthViewModel, navController: NavController) {
+fun SignupScreen(viewModel: AuthViewModel, navController: NavController) {
     ByteBuddyTheme {
         var eduList = remember { mutableStateOf(listOf<EducationModel>()) }
         var collegeList = remember { mutableStateOf(listOf<CollegeModel>()) }
@@ -72,6 +80,9 @@ fun SignupScreen(email: String, viewModel: AuthViewModel, navController: NavCont
 
 
         var name by remember { mutableStateOf("") }
+        var email by remember { mutableStateOf("") }
+        var pass by remember { mutableStateOf("") }
+        var confirmPass by remember { mutableStateOf("") }
         var dob by remember { mutableStateOf("") }
         var gender by remember { mutableStateOf("") }
         var profileImg by remember { mutableStateOf("") }
@@ -84,19 +95,7 @@ fun SignupScreen(email: String, viewModel: AuthViewModel, navController: NavCont
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Sp(h = 20.dp)
-            Text(
-                "Welcome to ByteBuddy",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(20.dp),
-                fontFamily = FontFamily.Cursive
-
-            )
-            Text(
-                "Creating account as $email",
-                style = MaterialTheme.typography.titleSmall
-            )
-            Sp(h = 20.dp)
+            Sp(h = 10.dp)
             Box(
                 modifier = Modifier
                     .fillMaxWidth(.95f)
@@ -127,7 +126,25 @@ fun SignupScreen(email: String, viewModel: AuthViewModel, navController: NavCont
                             },
                             hint = "Enter your good name"
                         )
-                        Sp(h = 5.dp)
+                        SignupTextField(
+                            value = email, label = "Email*", onTextChanged = {
+                                email = it
+                            },
+                            keyboardType = KeyboardType.Email
+                        )
+                        SignupTextField(
+                            label = "Password*", onTextChanged = {
+                                pass = it
+                            },
+                            keyboardType = KeyboardType.Password
+                        )
+                        SignupTextField(
+                            label = "Confirm Password*", onTextChanged = {
+                                confirmPass = it
+                            },
+                            keyboardType = KeyboardType.Password
+                        )
+                        Sp(h = 20.dp)
                         CusDropdown(
                             select = gender,
                             label = "Gender*", options = listOf(
@@ -164,11 +181,12 @@ fun SignupScreen(email: String, viewModel: AuthViewModel, navController: NavCont
                                 dob = "$d/$m/$y"
                             }
                         )
-                        Sp(20.dp)
+                        Sp(h = 10.dp)
+
                         AnimatedVisibility(visible = name.isNotEmpty()) {
                             CustomOutlinedButton(
                                 label = "Create an account as $name",
-                                isEnable = name.isNotEmpty() && dob.isNotEmpty() && gender.isNotEmpty() && education.courseName.isNotEmpty() && college.name.isNotEmpty()
+                                isEnable = (pass == confirmPass ) && email.isNotEmpty() && pass.isNotEmpty() && confirmPass.isNotEmpty() && name.isNotEmpty() && dob.isNotEmpty() && gender.isNotEmpty() && education.courseName.isNotEmpty() && college.name.isNotEmpty()
                             ) {
                                 viewModel.doSignup(
                                     UserModel(
@@ -187,12 +205,12 @@ fun SignupScreen(email: String, viewModel: AuthViewModel, navController: NavCont
                                         0,
                                         SavedModel(),
                                         emptyList()
-                                    ), navController
+                                    ), pass, navController
                                 )
                             }
                         }
 
-                        Sp(h = 30.dp)
+                        Sp(h = 20.dp)
                     }
                 }
                 val context = LocalContext.current
@@ -245,7 +263,50 @@ fun SignupScreen(email: String, viewModel: AuthViewModel, navController: NavCont
                             })
                 }
             }
-            Sp(h = 60.dp)
+            Sp(h = 20.dp)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Already have an account ? ")
+                Text("Login",
+                    color = MainColor,
+                    modifier = Modifier.clickable {
+                        navController.popBackStack()
+                    })
+            }
+            val context = LocalContext.current
+            viewModel.signupResult.collectAsState().value.let {
+                when (it) {
+                    is Resource.Loading -> {
+                        ProgressBarCus {
+
+                        }
+                    }
+
+                    is Resource.Failure -> {
+                        LaunchedEffect(key1 = true) {
+                            Toast.makeText(context, it.errorMsgBody, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        LaunchedEffect(key1 = true) {
+                            if (it.result) {
+                                navController.navigate(Screen.Main.route) {
+                                    popUpTo(Screen.Auth.Signup.route){
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
+
         }
     }
 }
