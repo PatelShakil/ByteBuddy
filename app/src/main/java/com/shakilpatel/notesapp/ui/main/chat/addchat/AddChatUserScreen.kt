@@ -41,7 +41,7 @@ fun AddChatUserScreen(viewModel : ChatViewModel,navController: NavController) {
                     ) {
                         var searchText by remember{ mutableStateOf("") }
                         SearchBar(hint = "Search Users") {
-                            searchText = it
+                            searchText = it.lowercase()
                         }
                         val baseList = it.result
                         val usersList = when(searchText){

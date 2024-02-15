@@ -113,7 +113,7 @@ fun ProfileTabsContent(pagerState: PagerState, navController: NavController) {
     HorizontalPager(state = pagerState) { page ->
         when (page) {
             0 -> {
-                FaqSampleScreen(viewModel = hiltViewModel())
+                FaqSampleScreen(viewModel = hiltViewModel(),navController)
             }
 
             1 -> {
@@ -172,7 +172,7 @@ fun NotesSampleScreen(
 }
 
 @Composable
-fun FaqSampleScreen(viewModel: FAQViewModel) {
+fun FaqSampleScreen(viewModel: FAQViewModel,navController: NavController) {
     Sp(h = 5.dp)
     var user by remember { mutableStateOf(UserModel()) }
     viewModel.getUserModel {
@@ -191,7 +191,7 @@ fun FaqSampleScreen(viewModel: FAQViewModel) {
 //        }
         if (user != UserModel()) {
             Log.d("User", user.toString())
-            FAQIterationStr(faqList = user.saved.errors, viewModel = viewModel)
+            FAQIterationStr(faqList = user.saved.errors, viewModel = viewModel, navController)
         } else
             ProgressBarIndicator()
     }

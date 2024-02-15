@@ -95,7 +95,7 @@ fun UploadTabsContent(pagerState: PagerState, navController: NavController) {
     HorizontalPager(state = pagerState) { page ->
         when (page) {
             0 -> {
-                UpFaqSampleScreen(viewModel = hiltViewModel(), hiltViewModel())
+                UpFaqSampleScreen(viewModel = hiltViewModel(), hiltViewModel(),navController)
             }
 
             1 -> {
@@ -146,7 +146,7 @@ fun UpNotesSampleScreen(
 }
 
 @Composable
-fun UpFaqSampleScreen(viewModel: FAQViewModel, profViewModel: ProfileViewModel) {
+fun UpFaqSampleScreen(viewModel: FAQViewModel, profViewModel: ProfileViewModel,navController: NavController) {
     Sp(h = 5.dp)
     var user by remember { mutableStateOf(UserModel()) }
     viewModel.getUserModel {
@@ -159,7 +159,7 @@ fun UpFaqSampleScreen(viewModel: FAQViewModel, profViewModel: ProfileViewModel) 
     ByteBuddyTheme {
         if (errorList.value.isNotEmpty()) {
             Log.d("User", user.toString())
-            FAQIterationStr(faqList = errorList.value.map { it.id }, viewModel = viewModel)
+            FAQIterationStr(faqList = errorList.value.map { it.id }, viewModel = viewModel, navController)
         } else
             ProgressBarIndicator()
     }

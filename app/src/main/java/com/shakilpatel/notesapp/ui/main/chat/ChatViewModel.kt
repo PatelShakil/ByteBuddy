@@ -1,5 +1,9 @@
 package com.shakilpatel.notesapp.ui.main.chat
 
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -13,8 +17,10 @@ import com.shakilpatel.notesapp.data.models.social.ConnectUserModel
 import com.shakilpatel.notesapp.data.models.user.UserModel
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader.init
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -28,7 +34,7 @@ class ChatViewModel @Inject constructor(
     //chat related operations without repos
 
     val uid = auth.uid.toString()
-    private val _connectedUsers = MutableStateFlow<Resource<Pair<List<UserModel>,List<ConnectUserModel>>>?>(null)
+    private val _connectedUsers = MutableStateFlow<Resource<List<Pair<UserModel,ConnectUserModel>>>?>(null)
     val connectedUsers = _connectedUsers
 
     private val _allUsers = MutableStateFlow<Resource<List<UserModel>>?>(null)
@@ -39,6 +45,7 @@ class ChatViewModel @Inject constructor(
 
     private val _chats = MutableStateFlow<Resource<List<ChatModel>>?>(null)
     val chats = _chats
+
 
 
     init {
@@ -76,6 +83,7 @@ class ChatViewModel @Inject constructor(
                         }
                     }
                     _chats.value = Resource.Success(chats)
+
                 }
             }
     }
@@ -138,16 +146,18 @@ class ChatViewModel @Inject constructor(
                     if (value != null) {
                         val users = mutableListOf<UserModel>()
                         val chats = mutableListOf<ConnectUserModel>()
+                        val pairList = mutableListOf<Pair<UserModel, ConnectUserModel>>()
                         viewModelScope.launch {
                             for (doc in value.documents) {
                                 val chat = doc.toObject(ConnectUserModel::class.java)
                                 if (chat != null) {
                                     val user = getUser(chat.receiverId)
+                                    pairList.add(Pair(user, chat))
                                     chats.add(chat)
                                     users.add(user)
                                 }
                             }
-                            _connectedUsers.value = Resource.Success(Pair(users,chats))
+                            _connectedUsers.value = Resource.Success(pairList)
                         }
                     }
                 }
@@ -213,6 +223,14 @@ class ChatViewModel @Inject constructor(
         fun resetChats() {
             _chats.value = null
         }
+
+    fun deleteMsg(selectedCID: String,context: Context) = viewModelScope.launch{
+        db.collection("conversations")
+            .document(selectedCID)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(context, "Message Deleted Successfully", Toast.LENGTH_SHORT).show()            }
+    }
 
 
 }

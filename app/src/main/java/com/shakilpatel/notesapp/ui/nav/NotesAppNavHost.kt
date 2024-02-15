@@ -18,14 +18,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.firebase.auth.FirebaseAuth
 import com.shakilpatel.notesapp.common.uicomponents.BadgeBottomNavigation
 import com.shakilpatel.notesapp.common.uicomponents.CusAppBar
+import com.shakilpatel.notesapp.ui.main.usersprofile.UsersProfileScreen
 import com.shakilpatel.notesapp.ui.nav.navigations.AuthNav
 import com.shakilpatel.notesapp.ui.nav.navigations.MainNav
 import com.shakilpatel.notesapp.ui.nav.navigations.NotiNav
@@ -119,6 +122,21 @@ fun NotesAppNavHost(onBack: () -> Unit) {
                     )
                 ){
                     NotificationScreen(viewModel = hiltViewModel(), hiltViewModel(), navController = navController)
+                }
+                composable(
+                    Screen.UsersProfile.route + "/{uid}",
+                    arguments = listOf(
+                        navArgument("uid"){
+                            type = NavType.StringType
+                        }
+                    )
+                ){
+                    if(it.arguments != null) {
+                        UsersProfileScreen(uid = it.arguments?.getString("uid")!!, viewModel = hiltViewModel(), navController =navController)
+                    }else{
+                        navController.popBackStack()
+                    }
+
                 }
             }
         }

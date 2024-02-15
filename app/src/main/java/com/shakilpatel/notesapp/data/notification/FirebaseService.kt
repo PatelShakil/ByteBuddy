@@ -28,6 +28,7 @@ import java.util.*
 
 class FirebaseService : FirebaseMessagingService() {
     var CHANNEL_ID = "channel_id"
+    var MSG_CHANNEL_ID = "l_id"
     val userRef = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().uid.toString())
 
 
@@ -51,32 +52,33 @@ class FirebaseService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         Log.d("Msg", message.data.toString())
-        val user = mutableStateOf(UserModel())
-        if(message.data["title"] != null || message.data["title"] != "") {
-            userRef.get().addOnSuccessListener {
-                if (it.exists()) {
-                    user.value = it.toObject(UserModel::class.java)!!
-                    val notiList = user.value.notifications.toMutableList()
-                    notiList.add(
-                        NotificationModel(
-                            Cons.generateRandomValue(9),
-                            message.data["title"] ?: "".trim(),
-                            message.data["message"] ?: "".trim(),
-                            message.data["faq"] ?: "",
-                            message.data["notesId"] ?: "",
-                            false,
-                            System.currentTimeMillis()
+        if(message.data["ismsg"].toString() == "false") {
+            val user = mutableStateOf(UserModel())
+            if (message.data["title"] != null || message.data["title"] != "") {
+                userRef.get().addOnSuccessListener {
+                    if (it.exists()) {
+                        user.value = it.toObject(UserModel::class.java)!!
+                        val notiList = user.value.notifications.toMutableList()
+                        notiList.add(
+                            NotificationModel(
+                                Cons.generateRandomValue(9),
+                                message.data["title"] ?: "".trim(),
+                                message.data["message"] ?: "".trim(),
+                                message.data["faq"] ?: "",
+                                message.data["notesId"] ?: "",
+                                false,
+                                System.currentTimeMillis()
+                            )
                         )
-                    )
-                    user.value.notifications = notiList
-                    userRef.set(user.value)
-                        .addOnSuccessListener {
-                            Log.d("Notification", "Stored Successfully")
-                        }
+                        user.value.notifications = notiList
+                        userRef.set(user.value)
+                            .addOnSuccessListener {
+                                Log.d("Notification", "Stored Successfully")
+                            }
+                    }
                 }
             }
         }
-
         val manager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationId = Random().nextInt()
@@ -103,15 +105,37 @@ class FirebaseService : FirebaseMessagingService() {
         }
         var notification: Notification? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notification = Notification.Builder(this, CHANNEL_ID)
-                .setContentTitle(message.data["title"])
-                .setContentText(message.data["message"])
-                .setSmallIcon(R.drawable.ic_notifications)
-                .setAutoCancel(true)
-                .setLargeIcon(BitmapFactory.decodeResource(applicationContext.resources, R.drawable.logo))
-                .setContentIntent(pendingIntent)
-                .build()
+            notification = if(message.data["ismsg"].toString() == "false") {
+                Notification.Builder(this, CHANNEL_ID)
+                    .setContentTitle(message.data["title"])
+                    .setContentText(message.data["message"])
+                    .setSmallIcon(R.drawable.ic_notifications)
+                    .setAutoCancel(true)
+                    .setLargeIcon(
+                        BitmapFactory.decodeResource(
+                            applicationContext.resources,
+                            R.drawable.logo
+                        )
+                    )
+                    .setContentIntent(pendingIntent)
+                    .build()
+            }else{
+                Notification.Builder(this,CHANNEL_ID)
+                    .setContentTitle(message.data["title"] + " sent you a message")
+                    .setContentText(message.data["message"])
+                    .setSmallIcon(R.drawable.ic_notifications)
+                    .setAutoCancel(true)
+                    .setLargeIcon(
+                        if(message.data["image"]?.toString() == "") {BitmapFactory.decodeResource(
+                            applicationContext.resources,
+                            R.drawable.ic_profile_round_img
+                        )} else Cons.decodeImage(message.data["image"].toString())
+                    )
+                    .setContentIntent(pendingIntent)
+                    .build()
+            }
         }
+        manager.notify(notificationId,notification)
         checkUserIsOnline(FirebaseAuth.getInstance().uid.toString()){
             if(!it){
                 manager.notify(notificationId, notification)

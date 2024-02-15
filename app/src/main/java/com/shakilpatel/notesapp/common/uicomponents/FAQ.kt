@@ -61,6 +61,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.Cons
 import com.shakilpatel.notesapp.common.HorizontalBrush
@@ -72,12 +73,14 @@ import com.shakilpatel.notesapp.data.models.user.UserModel
 import com.shakilpatel.notesapp.ui.main.feed.error.CodeViewText
 import com.shakilpatel.notesapp.ui.main.feed.error.ErrorSSView
 import com.shakilpatel.notesapp.ui.main.feed.error.FAQViewModel
+import com.shakilpatel.notesapp.ui.nav.Screen
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FAQItem(
     faq: FAQModel,
-    viewModel: FAQViewModel
+    viewModel: FAQViewModel,
+    navController: NavController
 ) {
     var user by remember { mutableStateOf(UserModel()) }
     var isSaved by remember { mutableStateOf(false) }
@@ -136,7 +139,7 @@ fun FAQItem(
                     ) {
                         Sp(w = 10.dp)
                         CircularImage(size = 45.dp, image = user.profileImg) {
-
+                            navController.navigate(Screen.UsersProfile.route + "/${user.uid}")
                         }
                         Sp(w = 5.dp)
                         Text(
@@ -546,7 +549,7 @@ fun DownVoteBox(selected: Boolean, count: Int, onClick: () -> Unit) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FAQIteration(faqList: List<FAQModel>, viewModel: FAQViewModel) {
+fun FAQIteration(faqList: List<FAQModel>, viewModel: FAQViewModel,navController: NavController) {
     val pagerState = rememberPagerState(
         initialPage = 0,
         initialPageOffsetFraction = 0f
@@ -566,7 +569,7 @@ fun FAQIteration(faqList: List<FAQModel>, viewModel: FAQViewModel) {
             flingBehavior = PagerDefaults.flingBehavior(state = pagerState)
         ) { page ->
             Sp(h = 10.dp)
-            FAQItem(faq = faqList[page], viewModel)
+            FAQItem(faq = faqList[page], viewModel, navController)
             Sp(h = 5.dp)
         }
 //                        LazyColumn(
@@ -602,7 +605,7 @@ fun FAQIteration(faqList: List<FAQModel>, viewModel: FAQViewModel) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FAQIterationStr(faqList: List<String>, viewModel: FAQViewModel) {
+fun FAQIterationStr(faqList: List<String>, viewModel: FAQViewModel,navController: NavController) {
     val pagerState = rememberPagerState(
         initialPage = 0,
         initialPageOffsetFraction = 0f
@@ -628,7 +631,8 @@ fun FAQIterationStr(faqList: List<String>, viewModel: FAQViewModel) {
             if (error.value != FAQModel()) {
                 FAQItem(
                     faq = error.value,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    navController = navController
                 )
             } else
                 ProgressBarIndicator()

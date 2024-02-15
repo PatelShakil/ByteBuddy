@@ -118,7 +118,8 @@ fun FaqScreen(faqId:String,viewModel: FAQViewModel, navController: NavController
                     }
                     FAQIteration(
                         faqList = dummylist.sortedBy { it.date }.reversed(),
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        navController
                     )
 
                 }

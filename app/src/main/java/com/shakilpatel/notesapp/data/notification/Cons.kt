@@ -31,7 +31,6 @@ object Cons {
             })
     }
 
-
     //Manifest permissions and services
 
 

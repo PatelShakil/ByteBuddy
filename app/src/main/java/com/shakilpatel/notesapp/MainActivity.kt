@@ -123,16 +123,40 @@ class MainActivity : ComponentActivity() {
         Log.d("Lifecycle",msg)
     }
 
+    override fun onStart() {
+        super.onStart()
+        setUserOnline()
+        log("onStart")
+    }
+    override fun onStop() {
+        super.onStop()
+        setUserOffline()
+        log("onStop")
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        setUserOffline()
+        log("onDestroy")
+    }
+    override fun onRestart() {
+        super.onRestart()
+        setUserOnline()
+        log("onRestart")
+    }
+    override fun onResume() {
+        super.onResume()
+        setUserOnline()
+        log("onResume")
+    }
     override fun onPause() {
         super.onPause()
         setUserOffline()
         log("onPause")
     }
-
-    override fun onResume() {
-        super.onResume()
-        setUserOnline()
-    log("onResume")
+    override fun onBackPressed() {
+        super.onBackPressed()
+        setUserOffline()
+        log("onBackPressed")
     }
 
 }
