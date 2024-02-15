@@ -2,6 +2,7 @@ package com.shakilpatel.notesapp.common.uicomponents
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -253,7 +254,8 @@ fun ProfileTextFieldDisabled(
 ) {
     OutlinedTextField(
         value = value, onValueChange = {},
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth()
+            .focusable(false),
         readOnly = true,
         label = { Text(label, style = MaterialTheme.typography.titleSmall, color = MainColor) },
         colors = TextFieldDefaults.outlinedTextFieldColors(

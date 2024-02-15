@@ -163,25 +163,11 @@ fun ChatDetailScreen(viewModel: ChatViewModel, navController: NavController) {
                                                     scrollState.animateScrollToItem(it.result.size - 1)
                                                 }
                                             }
-                                            val rootView = LocalView.current
-//                                            DisposableEffect(Unit) {
-//
-//                                                val listener = ViewTreeObserver.OnPreDrawListener {
-//                                                    coroutineScope.launch {
-//                                                        scrollState.animateScrollToItem(it.result.size)
-//                                                    }
-//                                                    true
-//                                                }
-//
-//                                                rootView.viewTreeObserver.addOnPreDrawListener(listener)
-//
-//                                                onDispose {
-//                                                    rootView.viewTreeObserver.removeOnPreDrawListener(listener)
-//                                                }
-//                                            }
 
-
-                                            val col = getRandomDarkColor()
+                                            var col by remember{mutableStateOf(Color(0xFF000000))}
+                                            LaunchedEffect(key1 = true) {
+                                                col = getRandomDarkColor()
+                                            }
                                             LazyColumn(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
@@ -316,24 +302,23 @@ fun ChatDetailScreen(viewModel: ChatViewModel, navController: NavController) {
                                             )
 
                                             view.vibrate()
-                                        }
-                                        if(!receiverUser.online){com.shakilpatel.notesapp.data.notification.Cons.sendNotification(
-                                            PushNotification(
-                                                NotificationData(
-                                                    "Someone",
-                                                    msg,
-                                                    time = System.currentTimeMillis(),
-                                                    uid = FirebaseAuth.getInstance().uid!!,
 
-                                                ),
-                                                receiverUser.token,
-                                                ismsg = true
+                                        if (!receiverUser.online) {
+                                            com.shakilpatel.notesapp.data.notification.Cons.sendNotification(
+                                                PushNotification(
+                                                    NotificationData(
+                                                        "",
+                                                        msg,
+                                                        time = System.currentTimeMillis(),
+                                                        uid = FirebaseAuth.getInstance().uid!!,
+                                                        ),
+                                                    receiverUser.token,
+                                                    ismsg = true
+                                                )
                                             )
-                                        )
-
-
                                         }
                                         msg = ""
+                                        }
                                     },
                                 elevation = CardDefaults.cardElevation(8.dp),
 
@@ -380,13 +365,13 @@ fun ChatLoad(isSend : Boolean= true) {
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .width(width)
-                    .height(28.dp)
+                    .height(32.dp)
                     .clip(
                         RoundedCornerShape(
-                            topEnd = 10.dp,
+                            topEnd = 15.dp,
                             bottomEnd = 0.dp,
-                            topStart = 10.dp,
-                            bottomStart = 10.dp
+                            topStart = 15.dp,
+                            bottomStart = 15.dp
                         )
                     )
                     .shimmerEffect()
@@ -398,13 +383,13 @@ fun ChatLoad(isSend : Boolean= true) {
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .width(width)
-                    .height(28.dp)
+                    .height(32.dp)
                     .clip(
                         RoundedCornerShape(
-                            topEnd = 10.dp,
-                            bottomEnd = 10.dp,
-                            topStart = 10.dp,
-                            bottomStart = 0.dp
+                            topEnd = 15.dp,
+                            bottomEnd = 15.dp,
+                            topStart = 0.dp,
+                            bottomStart = 15.dp
                         )
                     )
                     .shimmerEffect()
@@ -443,27 +428,29 @@ fun ChatMessageCard(chat: ChatModel, rid: String,col : Color,onDeleteMsg : ()->U
             .fillMaxWidth()
             .padding(5.dp)
     ) {
+        val sShape = RoundedCornerShape(
+            topEnd = 15.dp,
+            bottomEnd = 0.dp,
+            topStart = 15.dp,
+            bottomStart = 15.dp
+        )
+        val rShape = RoundedCornerShape(
+            topEnd = 15.dp,
+            bottomEnd = 15.dp,
+            topStart = 0.dp,
+            bottomStart = 15.dp
+        )
 
         if (chat.receiverId != rid) {
             Column(
                 modifier = Modifier
                     .shadow(
-                        2.dp, RoundedCornerShape(
-                            topEnd = 10.dp,
-                            bottomEnd = 10.dp,
-                            topStart = 10.dp,
-                            bottomStart = 0.dp
-                        )
+                        2.dp, rShape
                     )
                     .widthIn(max = 300.dp, min = 80.dp)
                     .align(Alignment.CenterStart)
                     .background(
-                        col, RoundedCornerShape(
-                            topEnd = 10.dp,
-                            bottomEnd = 10.dp,
-                            topStart = 10.dp,
-                            bottomStart = 0.dp
-                        )
+                        col, rShape
                     )
 
                 ) {
@@ -501,22 +488,13 @@ fun ChatMessageCard(chat: ChatModel, rid: String,col : Color,onDeleteMsg : ()->U
                 Box (
                     modifier = Modifier
                         .shadow(
-                            2.dp, RoundedCornerShape(
-                                topEnd = 10.dp,
-                                bottomEnd = 0.dp,
-                                topStart = 10.dp,
-                                bottomStart = 10.dp
-                            )
+                            2.dp, sShape
                         )
                         .widthIn(max = 300.dp, min = 80.dp)
                         .background(
-                            MainColor, RoundedCornerShape(
-                                topEnd = 10.dp,
-                                bottomEnd = 0.dp,
-                                topStart = 10.dp,
-                                bottomStart = 10.dp
-                            )
-                        ),
+                            MainColor, sShape
+                        )
+                        .padding(5.dp),
 //                    horizontalArrangement = Arrangement.SpaceBetween,
 //                    verticalAlignment = Alignment.Bottom
                 ) {

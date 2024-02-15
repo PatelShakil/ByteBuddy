@@ -128,8 +128,9 @@ fun ChatLandingScreen(viewModel: ChatViewModel,navController: NavController,onBa
                                             horizontalAlignment = Alignment.CenterHorizontally,
                                             verticalArrangement = Arrangement.Center
                                         ){
+                                            Sp(h = 50.dp)
                                             Text("You're not having any chat yet", color = MainColor)
-                                            Sp(h= 30.dp)
+                                            Sp(h= 20.dp)
 
                                             Box(
                                                 modifier= Modifier.size(60.dp)
@@ -151,7 +152,7 @@ fun ChatLandingScreen(viewModel: ChatViewModel,navController: NavController,onBa
 
                                         }
                                     }
-                                    if(filterList.isEmpty() && baseList.isNotEmpty()){
+                                    if(filterList.isEmpty() and baseList.isNotEmpty()){
                                         OnNoDataFound(msg = "No user found")
                                     }
                                     filterList.sortedBy {  it.second.lastMsgTime}.reversed().forEachIndexed { index, pair ->

@@ -34,7 +34,8 @@ class ChatViewModel @Inject constructor(
     //chat related operations without repos
 
     val uid = auth.uid.toString()
-    private val _connectedUsers = MutableStateFlow<Resource<List<Pair<UserModel,ConnectUserModel>>>?>(null)
+    private val _connectedUsers =
+        MutableStateFlow<Resource<List<Pair<UserModel, ConnectUserModel>>>?>(null)
     val connectedUsers = _connectedUsers
 
     private val _allUsers = MutableStateFlow<Resource<List<UserModel>>?>(null)
@@ -47,7 +48,6 @@ class ChatViewModel @Inject constructor(
     val chats = _chats
 
 
-
     init {
         getAllUsers()
         getConnectedUsers()
@@ -58,10 +58,11 @@ class ChatViewModel @Inject constructor(
         db.collection("conversations")
             .where(
                 Filter.or(
-                Filter.and(
-                    Filter.equalTo("senderId", uid),
-                    Filter.equalTo("receiverId", recieverId),
-                ),
+
+                    Filter.and(
+                        Filter.equalTo("senderId", uid),
+                        Filter.equalTo("receiverId", recieverId),
+                    ),
                     Filter.and(
                         Filter.equalTo("senderId", recieverId),
                         Filter.equalTo("receiverId", uid),
@@ -135,7 +136,12 @@ class ChatViewModel @Inject constructor(
         _connectedUsers.value = Resource.Loading
         try {
             db.collection("chats")
-                .where(Filter.or(Filter.equalTo("senderId", uid), Filter.equalTo("receiverId", uid)))
+                .where(
+                    Filter.or(
+                        Filter.equalTo("senderId", uid),
+                        Filter.equalTo("receiverId", uid)
+                    )
+                )
 //                .whereEqualTo("senderId", uid)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
@@ -152,13 +158,13 @@ class ChatViewModel @Inject constructor(
                             for (doc in value.documents) {
                                 val chat = doc.toObject(ConnectUserModel::class.java)
                                 if (chat != null) {
-                                    val user = getUser(chat.receiverId)
+                                    val user = getUser(if(uid == chat.senderId) chat.receiverId else chat.senderId)
                                     pairList.add(Pair(user, chat))
                                     chats.add(chat)
                                     users.add(user)
                                 }
                             }
-                            _connectedUsers.value = Resource.Success(pairList)
+                            _connectedUsers.value = Resource.Success(pairList.distinctBy { it.first.uid })
                         }
                     }
                 }
@@ -187,50 +193,51 @@ class ChatViewModel @Inject constructor(
     }
 
 
-        fun resetRecieverUser() {
-            _recieverUser.value = null
-        }
+    fun resetRecieverUser() {
+        _recieverUser.value = null
+    }
 
-        fun sendMsg(msg: String, recieverId: String) = viewModelScope.launch {
-            val id = Cons.generateRandomValue(16)
-            db.collection("conversations")
-                .document(id)
-                .set(
-                    ChatModel(
-                        id,
-                        senderId = FirebaseAuth.getInstance().uid.toString(),
-                        receiverId = recieverId,
-                        msg,
-                        System.currentTimeMillis(),
-                        "",
-                        "",
-                        ""
-                    )
+    fun sendMsg(msg: String, recieverId: String) = viewModelScope.launch {
+        val id = Cons.generateRandomValue(16)
+        db.collection("conversations")
+            .document(id)
+            .set(
+                ChatModel(
+                    id,
+                    senderId = FirebaseAuth.getInstance().uid.toString(),
+                    receiverId = recieverId,
+                    msg,
+                    System.currentTimeMillis(),
+                    "",
+                    "",
+                    ""
                 )
-                .addOnSuccessListener {
-                    db.collection("chats")
-                        .document(uid + recieverId)
-                        .set(
-                            ConnectUserModel(
-                                uid,
-                                recieverId,
-                                msg,
-                                System.currentTimeMillis()
-                            )
+            )
+            .addOnSuccessListener {
+                db.collection("chats")
+                    .document(uid + recieverId)
+                    .set(
+                        ConnectUserModel(
+                            uid,
+                            recieverId,
+                            msg,
+                            System.currentTimeMillis()
                         )
-                }
-        }
+                    )
+            }
+    }
 
-        fun resetChats() {
-            _chats.value = null
-        }
+    fun resetChats() {
+        _chats.value = null
+    }
 
-    fun deleteMsg(selectedCID: String,context: Context) = viewModelScope.launch{
+    fun deleteMsg(selectedCID: String, context: Context) = viewModelScope.launch {
         db.collection("conversations")
             .document(selectedCID)
             .delete()
             .addOnSuccessListener {
-                Toast.makeText(context, "Message Deleted Successfully", Toast.LENGTH_SHORT).show()            }
+                Toast.makeText(context, "Message Deleted Successfully", Toast.LENGTH_SHORT).show()
+            }
     }
 
 
