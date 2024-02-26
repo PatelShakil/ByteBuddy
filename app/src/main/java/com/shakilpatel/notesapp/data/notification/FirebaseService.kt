@@ -34,18 +34,20 @@ class FirebaseService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        userRef.get().addOnSuccessListener { 
-            if(it.exists()){
-                val user = it.toObject(UserModel::class.java)!!
-                user.token = token
-                userRef.set(user)
-                    .addOnSuccessListener {
-                        Toast.makeText(
-                            this,
-                            "New Token Registered Successfully",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+        if(FirebaseAuth.getInstance().uid  != null) {
+            userRef.get().addOnSuccessListener {
+                if (it.exists()) {
+                    val user = it.toObject(UserModel::class.java)!!
+                    user.token = token
+                    userRef.set(user)
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                this,
+                                "New Token Registered Successfully",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                }
             }
         }
     }

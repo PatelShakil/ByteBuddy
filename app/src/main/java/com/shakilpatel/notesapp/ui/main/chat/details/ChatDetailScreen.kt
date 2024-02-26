@@ -1,6 +1,15 @@
 package com.shakilpatel.notesapp.ui.main.chat.details
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.speech.tts.TextToSpeech
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +17,9 @@ import android.view.ViewTreeObserver
 import android.view.accessibility.AccessibilityManager
 import android.widget.EditText
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -85,6 +97,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -93,6 +107,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
+import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.Cons
 import com.shakilpatel.notesapp.common.LightColor
 import com.shakilpatel.notesapp.common.MainColor
@@ -135,6 +150,7 @@ fun ChatDetailScreen(viewModel: ChatViewModel, navController: NavController) {
                     }
                     val receiverUser = it.result
                     var msg by remember { mutableStateOf("") }
+                    var isEditable by remember{ mutableStateOf(false) }
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -165,6 +181,7 @@ fun ChatDetailScreen(viewModel: ChatViewModel, navController: NavController) {
                                             }
 
                                             var col by remember{mutableStateOf(Color(0xFF000000))}
+                                            var selectedMsgId by remember{mutableStateOf(ChatModel())}
                                             LaunchedEffect(key1 = true) {
                                                 col = getRandomDarkColor()
                                             }
@@ -180,10 +197,18 @@ fun ChatDetailScreen(viewModel: ChatViewModel, navController: NavController) {
                                                     }
                                                 }
                                                 items(it.result.sortedBy { it.date }) {
-                                                    ChatMessageCard(it, receiverUser.uid,col){
+                                                    ChatMessageCard(it, receiverUser.uid,col,{
                                                         isDeleteConfirm = true
                                                         selectedCID = it.id
-                                                    }
+                                                    },
+                                                        {
+                                                            selectedCID = it.id
+                                                            msg = it.message
+                                                            isEditable = true
+                                                            selectedMsgId = it.copy(it.message)
+                                                        }
+                                                    )
+
                                                 }
                                                 item{
                                                     Sp(h = 70.dp)
@@ -234,6 +259,68 @@ fun ChatDetailScreen(viewModel: ChatViewModel, navController: NavController) {
                                                     }
                                                 )
                                             }
+                                            if(isEditable){
+                                                Dialog(
+                                                    onDismissRequest = {
+                                                        isEditable = false
+                                                    }
+                                                ){
+
+                                                    Card(
+                                                        modifier =Modifier.fillMaxWidth()
+                                                    ){
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(
+                                                                    20.dp
+                                                                )
+                                                        ){
+                                                            SimpleTextField(
+                                                                value = msg,
+                                                                onValueChange = {
+                                                                    msg = it
+                                                                },
+                                                                modifier = Modifier.weight(.7f).height(45.dp)
+                                                            )
+
+                                                            Card(
+                                                                colors = CardDefaults.cardColors(MainColor),
+                                                                shape = CircleShape,
+                                                                modifier = Modifier
+                                                                    .size(45.dp)
+                                                                    .clickable {
+                                                                        if (msg.isNotEmpty()) {
+                                                                            viewModel.editMsg(
+                                                                                msg =  selectedMsgId.copy(id = selectedCID,message = msg),
+                                                                            selectedCID
+                                                                                )
+                                                                            msg = ""
+                                                                            isEditable= false
+                                                                            selectedMsgId = ChatModel()
+                                                                        }
+                                                                    },
+                                                                elevation = CardDefaults.cardElevation(8.dp),
+
+                                                                ) {
+                                                                Box(
+                                                                    modifier = Modifier.fillMaxSize(),
+                                                                    contentAlignment = Alignment.Center
+                                                                ) {
+                                                                    Icon(
+                                                                        Icons.Default.Send,
+                                                                        "",
+                                                                        tint = WhiteColor,
+                                                                    )
+                                                                }
+                                                            }
+
+
+                                                        }
+                                                    }
+                                                }
+                                            }
+
                                         }
 
                                         is Resource.Failure -> {}
@@ -256,7 +343,6 @@ fun ChatDetailScreen(viewModel: ChatViewModel, navController: NavController) {
                             }
                         }
 
-
                         Row(
                             modifier = Modifier
 
@@ -269,72 +355,126 @@ fun ChatDetailScreen(viewModel: ChatViewModel, navController: NavController) {
                                 .align(Alignment.BottomCenter),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-
-                            Card(
-                                modifier = Modifier.weight(.8f),
-                                elevation = CardDefaults.cardElevation(8.dp),
-                                shape = CircleShape
-                            ) {
-                                SimpleTextField(
-                                    value = msg, onValueChange = {
-                                        msg = it
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(45.dp)
-                                        .focusable(true),
-                                    maxLines = 6,
-                                    placeholder = { Text("Enter Message") }
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(5.dp))
-                            val view = LocalView.current
-                            Card(
-                                colors = CardDefaults.cardColors(MainColor),
-                                shape = CircleShape,
-                                modifier = Modifier
-                                    .size(45.dp)
-                                    .clickable {
-                                        if (msg.isNotEmpty()) {
-                                            viewModel.sendMsg(
-                                                msg = msg.trim(),
-                                                recieverId = it.result.uid,
-                                            )
-
-                                            view.vibrate()
-
-                                        if (!receiverUser.online) {
-                                            com.shakilpatel.notesapp.data.notification.Cons.sendNotification(
-                                                PushNotification(
-                                                    NotificationData(
-                                                        "",
-                                                        msg,
-                                                        time = System.currentTimeMillis(),
-                                                        uid = FirebaseAuth.getInstance().uid!!,
-                                                        type = "msg"
-                                                        ),
-                                                    receiverUser.token,
-                                                    ismsg = "true"
-                                                )
-                                            )
-                                        }
-                                        msg = ""
-                                        }
-                                    },
-                                elevation = CardDefaults.cardElevation(8.dp),
-
+                                Card(
+                                    modifier = Modifier.weight(.8f),
+                                    elevation = CardDefaults.cardElevation(8.dp),
+                                    shape = CircleShape
                                 ) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        Icons.Default.Send,
-                                        "",
-                                        tint = WhiteColor,
+
+                                    val context = LocalContext.current
+                                    val speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
+                                    val recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                                    recognizerIntent.putExtra(
+                                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
                                     )
+                                    val speechTextState = remember { mutableStateOf(TextFieldValue()) }
+
+                                    val speechRecognitionLauncher = rememberLauncherForActivityResult(
+                                        contract = ActivityResultContracts.RequestPermission(),
+                                        onResult = { isGranted: Boolean ->
+                                            if (isGranted) {
+                                                speechRecognizer.startListening(recognizerIntent)
+                                            }
+                                        }
+                                    )
+                                    SimpleTextField(
+                                        value = msg, onValueChange = {
+                                            msg = it
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(45.dp)
+                                            .focusable(true),
+                                        maxLines = 6,
+                                        placeholder = { Text("Enter Message") },
+                                        trailingIcon = {
+                                            Icon(
+                                                painterResource(R.drawable.ic_mic),
+                                                "",
+                                                modifier = Modifier.clickable{
+                                                    if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                                                        speechRecognizer.startListening(recognizerIntent)
+                                                    } else {
+                                                        speechRecognitionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    )
+                                    speechRecognizer.setRecognitionListener(object : RecognitionListener {
+                                        override fun onReadyForSpeech(params: Bundle?) {}
+                                        override fun onBeginningOfSpeech() {}
+                                        override fun onRmsChanged(rmsdB: Float) {}
+                                        override fun onBufferReceived(buffer: ByteArray?) {}
+                                        override fun onEndOfSpeech() {}
+                                        override fun onError(error: Int) {}
+                                        override fun onResults(results: Bundle?) {
+                                            val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                                            if (!matches.isNullOrEmpty()) {
+                                                speechTextState.value = TextFieldValue(matches[0])
+                                                msg = speechTextState.value.text
+                                            }
+                                        }
+                                        override fun onPartialResults(partialResults: Bundle?) {
+                                            val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                                            if (!matches.isNullOrEmpty()) {
+                                                speechTextState.value = TextFieldValue(matches[0])
+                                                msg = speechTextState.value.text
+                                            }
+                                        }
+                                        override fun onEvent(eventType: Int, params: Bundle?) {}
+                                    })
                                 }
-                            }
+
+                                Spacer(modifier = Modifier.width(5.dp))
+                                val view = LocalView.current
+                                Card(
+                                    colors = CardDefaults.cardColors(MainColor),
+                                    shape = CircleShape,
+                                    modifier = Modifier
+                                        .size(45.dp)
+                                        .clickable {
+                                            if (msg.isNotEmpty()) {
+                                                viewModel.sendMsg(
+                                                    msg = msg.trim(),
+                                                    recieverId = it.result.uid,
+                                                )
+
+                                                view.vibrate()
+
+                                                if (!receiverUser.online) {
+                                                    com.shakilpatel.notesapp.data.notification.Cons.sendNotification(
+                                                        PushNotification(
+                                                            NotificationData(
+                                                                "",
+                                                                msg,
+                                                                time = System.currentTimeMillis(),
+                                                                uid = FirebaseAuth.getInstance().uid!!,
+                                                                type = "msg"
+                                                            ),
+                                                            receiverUser.token,
+                                                            ismsg = "true"
+                                                        )
+                                                    )
+                                                }
+                                                msg = ""
+                                            }
+                                        },
+                                    elevation = CardDefaults.cardElevation(8.dp),
+
+                                    ) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Send,
+                                            "",
+                                            tint = WhiteColor,
+                                        )
+                                    }
+                                }
                         }
                     }
 
@@ -423,7 +563,7 @@ private fun Context.isTouchExplorationEnabled(): Boolean {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ChatMessageCard(chat: ChatModel, rid: String,col : Color,onDeleteMsg : ()->Unit) {
+fun ChatMessageCard(chat: ChatModel, rid: String,col : Color,onDeleteMsg : ()->Unit,onDoubleTap:()->Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -482,6 +622,9 @@ fun ChatMessageCard(chat: ChatModel, rid: String,col : Color,onDeleteMsg : ()->U
                                 // perform some action here..
                                 view.vibrateStrong()
                                 onDeleteMsg()
+                            },
+                            onDoubleTap = {
+                                onDoubleTap()
                             }
                         )
                     }

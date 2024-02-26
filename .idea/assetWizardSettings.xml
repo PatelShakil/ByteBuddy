@@ -307,7 +307,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/C:/SDK/icons/material/materialicons/send/baseline_send_24.xml" />
+                                      <entry key="url" value="file:/$PROJECT_DIR$/../../SDK/icons/material/materialicons/mic/baseline_mic_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -317,7 +317,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_send" />
+                            <entry key="outputName" value="ic_mic" />
                             <entry key="sourceFile" value="C:\Users\Salman Patel\AndroidStudioProjects\ByteBuddy" />
                           </map>
                         </option>

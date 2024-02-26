@@ -14,18 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val repo: AuthRepo,
-    private val context : Context,
     private val auth : FirebaseAuth
 ) : ViewModel() {
-
-    fun checkUserExist(): Boolean {
-        return FirebaseAuth.getInstance().uid != null
-    }
-
-    fun getUserEmail(): String {
-        return FirebaseAuth.getInstance().currentUser?.email!!
-    }
 
 
     fun isUserExists( navController: NavController) {

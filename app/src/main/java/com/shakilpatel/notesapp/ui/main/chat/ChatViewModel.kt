@@ -240,5 +240,17 @@ class ChatViewModel @Inject constructor(
             }
     }
 
+    fun editMsg(msg: ChatModel,id : String) {
+        db.collection("conversations")
+            .document(id)
+//            .set("message",msg.message)
+            .set(msg)
+            .addOnSuccessListener {
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+            }
+    }
+
 
 }
