@@ -106,7 +106,7 @@ class Cons() {
             } catch (e: java.lang.Exception) {
                 Log.d("Exception", e.localizedMessage)
             }
-            return packageInfo!!.versionName
+            return packageInfo!!.versionName!!
         }
 
         fun encodeImage(bitmap: Bitmap): String {
