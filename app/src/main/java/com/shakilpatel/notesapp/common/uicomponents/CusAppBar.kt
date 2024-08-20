@@ -52,11 +52,6 @@ import com.shakilpatel.notesapp.data.models.user.UserModel
 import com.shakilpatel.notesapp.ui.auth.AuthViewModel
 import com.shakilpatel.notesapp.ui.nav.Screen
 
-@Preview
-@Composable
-fun AppBarCallingFun() {
-//    CusAppBar(rememberNavController())
-}
 
 @Composable
 fun CusAppBar(navController: NavController, viewModel: AuthViewModel) {
@@ -152,8 +147,8 @@ fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthVi
             )
         },
         navigationIcon = {
-            Sp(w = 10.dp)
             if (navController.currentBackStackEntryAsState().value?.destination?.route != Screen.Main.Home.Landing.route) {
+                Sp(w = 10.dp)
                 Icon(Icons.Default.ArrowBack, "", tint = White,
                     modifier = Modifier.clickable {
                         navController.popBackStack()
@@ -168,7 +163,6 @@ fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthVi
 
                 })
             Sp(w = 10.dp)
-            viewModel.getUnreadNotiCount()
             val c = viewModel.notiCount.intValue
             if (navController.currentBackStackEntryAsState().value?.destination?.route != Screen.Notification.route) {
                 Box {

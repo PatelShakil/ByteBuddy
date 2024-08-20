@@ -60,9 +60,6 @@ import kotlin.random.Random
 fun ChatLandingScreen(viewModel: ChatViewModel,navController: NavController,onBack:()->Unit) {
 
     ByteBuddyTheme {
-        LaunchedEffect(key1 = true) {
-            viewModel.getConnectedUsers()
-        }
         Box(
             modifier =Modifier.fillMaxSize()
         ) {

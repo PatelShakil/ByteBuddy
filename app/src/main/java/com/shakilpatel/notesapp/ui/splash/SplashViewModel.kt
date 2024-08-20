@@ -19,9 +19,10 @@ class SplashViewModel @Inject constructor(
 
 
     fun isUserExists( navController: NavController) {
-        val uid = auth.uid.toString()
+        val uid = auth.uid
+        Log.d("UID SPLASH",uid ?: "null")
 
-        if(uid.isNotEmpty()){
+        if(!uid.isNullOrEmpty()){
             navController.navigate(Screen.Main.route){
                 popUpTo(Screen.Splash.route){
                     inclusive = true

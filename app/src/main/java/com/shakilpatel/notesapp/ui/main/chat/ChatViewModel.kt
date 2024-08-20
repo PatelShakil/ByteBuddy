@@ -1,6 +1,7 @@
 package com.shakilpatel.notesapp.ui.main.chat
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateOf
@@ -183,6 +184,7 @@ class ChatViewModel @Inject constructor(
                     if (user != null) {
                         continuation.resume(user)
                     } else {
+                        Log.d("USER ID",userId)
                         continuation.resumeWithException(NullPointerException("User not found"))
                     }
                 }

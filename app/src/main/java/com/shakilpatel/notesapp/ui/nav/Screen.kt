@@ -10,7 +10,7 @@ sealed class Screen(val route: String, var title: String = "") {
 
     object Main : Screen("main") {
         object Home : Screen("home") {
-            object Landing : Screen("home_landing", "Home")
+            object Landing : Screen("home_landing", "ByteBuddy")
             object Subject : Screen("subject")
             object Notes : Screen("notes")
         }

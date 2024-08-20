@@ -2,6 +2,7 @@ package com.shakilpatel.notesapp.ui.main.home
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,7 +63,9 @@ import com.shakilpatel.notesapp.data.notification.NotificationData
 import com.shakilpatel.notesapp.data.notification.PushNotification
 import com.shakilpatel.notesapp.ui.main.home.notes.NotesViewModel
 import com.shakilpatel.notesapp.ui.nav.Screen
+import com.shakilpatel.notesapp.ui.splash.findActivity
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
@@ -69,6 +75,7 @@ fun HomeScreen(
     onBack: () -> Unit
 ) {
 //    val notesList = viewModel.notesCol.collectAsState()
+    val context = LocalContext.current
     ByteBuddyTheme {
         BackHandler {
             onBack()
@@ -81,6 +88,7 @@ fun HomeScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .fillMaxSize()
+                            .navigationBarsPadding()
                             .background(
                                 HorizontalBrush
                             )
@@ -174,7 +182,12 @@ fun CourseCard(
                 .background(HorizontalBrush)
         ) {
             var isExpanded by rememberSaveable{mutableStateOf(false)}
-            val icon = if(isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown
+
+            LaunchedEffect(key1 = true) {
+                delay(250)
+                isExpanded = true
+            }
+
             Row(
                 modifier= Modifier
                     .fillMaxWidth()
@@ -187,13 +200,6 @@ fun CourseCard(
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(start = 10.dp),
                     fontFamily = FontFamily.Serif
-                )
-                Icon(
-                    icon,
-                    "",
-                    modifier = Modifier.clickable {
-                        isExpanded = !isExpanded
-                    }
                 )
             }
             Divider(
