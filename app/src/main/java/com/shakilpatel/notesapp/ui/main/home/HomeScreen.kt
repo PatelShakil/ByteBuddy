@@ -216,7 +216,7 @@ fun CourseCard(
                         SemCardItem(sem = it, onSemClick = {
                             viewModel.setCourse(it.courseId + it.name)
                             viewModel.setSubject(it.id)
-                            if ((it.courseId + it.name).contains("BCA"))
+                            if ((it.courseId + it.name).contains("BCA") || (it.courseId + it.name).contains("MSC ICT"))
                                 navController.navigate(Screen.Main.Home.Subject.route + "/${it.courseId + it.name}")
                             else
                                 navController.navigate(Screen.Main.Home.Notes.route + "/${it.id}/${it.courseId}")

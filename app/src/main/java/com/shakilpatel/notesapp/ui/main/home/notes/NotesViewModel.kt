@@ -2,6 +2,7 @@ package com.shakilpatel.notesapp.ui.main.home.notes
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -119,6 +120,7 @@ class NotesViewModel @Inject constructor(
     private fun getCoursesList() = viewModelScope.launch {
         notesRepo.getCoursesList {
             _courses.value = it
+            Log.d("TAG", "getCoursesList: ${_courses.value}")
         }
     }
 

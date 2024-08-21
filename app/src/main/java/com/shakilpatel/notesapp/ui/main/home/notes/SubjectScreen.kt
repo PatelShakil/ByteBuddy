@@ -1,5 +1,6 @@
 package com.shakilpatel.notesapp.ui.main.home.notes
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -30,7 +31,7 @@ import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 
 @Composable
 fun SubjectScreen(course: String, viewModel: NotesViewModel, navController: NavController) {
-    val sem = course.replace("BCA", "")
+    val sem = course.replace("BCA", "").replace("MSC ICT","")
     viewModel.courses.collectAsState().value.let {
         when (it) {
             is Resource.Success -> {
@@ -47,12 +48,14 @@ fun SubjectScreen(course: String, viewModel: NotesViewModel, navController: NavC
                         ) {
 
                             if (sem.isNotEmpty()) {
-                                it.result[0].semList.filter { it.name == sem }[0].subjects.sortedBy {
+                                Log.d("Course", "SubjectScreen: $course")
+                                it.result.find { course.contains(it.name) }?.semList?.filter { it.name == sem }
+                                    ?.get(0)?.subjects?.sortedBy {
                                     it.id.substring(
                                         0,
                                         3
                                     )
-                                }.forEachIndexed { index, subjectModel ->
+                                }?.forEachIndexed { index, subjectModel ->
                                     item {
                                         SubjectItem(
                                             index = subjectModel.id,

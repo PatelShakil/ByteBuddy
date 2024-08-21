@@ -47,10 +47,9 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.Cons
-import com.shakilpatel.notesapp.common.LightColor
+import com.shakilpatel.notesapp.common.HorizontalBrush
 import com.shakilpatel.notesapp.common.MainColor
 import com.shakilpatel.notesapp.common.Resource
-import com.shakilpatel.notesapp.common.HorizontalBrush
 import com.shakilpatel.notesapp.common.tools.rememberGetContentContractLauncher
 import com.shakilpatel.notesapp.common.uicomponents.CusDropdown
 import com.shakilpatel.notesapp.common.uicomponents.CustomOutlinedButton
@@ -89,11 +88,13 @@ fun NotesTabContent(viewModel: CreateViewModel, navController: NavController) {
             is Resource.Success -> {
                 courseName = it.result.map { it.name }.toMutableList()
                 semName =
-                    it.result.filter { it.name == "BCA" }[0].semList.map { it.name }.toMutableList()
+                    it.result.find { it.name == course }?.semList?.map { it.name }?.toMutableList()
+                        ?: mutableListOf()
                 plList =
                     it.result.filter { it.name == "Programming Language" }[0].semList.map { it.name }
                         .toMutableList()
-                semList = it.result.filter { it.name == "BCA" }[0].semList.toMutableList()
+                semList = it.result.find { it.name == course }?.semList?.toMutableList()
+                    ?: mutableListOf()
             }
 
             else -> {}
@@ -232,7 +233,12 @@ fun NotesTabContent(viewModel: CreateViewModel, navController: NavController) {
                         subject = ""
                     }
                 )
-                if (course == "BCA") {
+
+                if (course == "Programming Language") {
+                    CusDropdown(label = "Programming Language*", options = plList, onSelected = {
+                        subject = it
+                    })
+                } else if (course.isNotEmpty()) {
                     CusDropdown(label = "Semester*", options = semName, onSelected = {
                         sem = it
                         courseUp = course + it
@@ -245,11 +251,6 @@ fun NotesTabContent(viewModel: CreateViewModel, navController: NavController) {
                                 subject = it
                             })
                     }
-                }
-                if (course == "Programming Language") {
-                    CusDropdown(label = "Programming Language*", options = plList, onSelected = {
-                        subject = it
-                    })
                 }
                 Sp(20.dp)
                 AnimatedVisibility(

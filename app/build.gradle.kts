@@ -87,6 +87,7 @@ dependencies {
 
     //image loading library from url
     implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("io.coil-kt:coil-gif:2.4.0")
 
 
     //notification api
