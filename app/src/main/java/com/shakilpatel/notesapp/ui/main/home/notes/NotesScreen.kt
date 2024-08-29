@@ -1,5 +1,6 @@
 package com.shakilpatel.notesapp.ui.main.home.notes
 
+import android.app.Activity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -53,6 +54,8 @@ import com.shakilpatel.notesapp.common.uicomponents.SearchBar
 import com.shakilpatel.notesapp.common.uicomponents.Sp
 import com.shakilpatel.notesapp.data.models.learning.NotesModel
 import com.shakilpatel.notesapp.data.models.user.UserModel
+import com.shakilpatel.notesapp.ui.ads.AdmobBanner
+import com.shakilpatel.notesapp.ui.ads.showInterstialAd
 import com.shakilpatel.notesapp.ui.nav.Screen
 
 
@@ -99,6 +102,9 @@ fun NotesScreen(
                             )
                             Sp(10.dp)
                         }
+                        item{
+                            AdmobBanner(modifier= Modifier.padding(vertical = 10.dp))
+                        }
                         item {
                             if (it.result.filter { it.verified }.isNotEmpty()) {
                                 NotesColCard(
@@ -109,6 +115,9 @@ fun NotesScreen(
                                 )
                                 Sp(10.dp)
                             }
+                        }
+                        item{
+                            AdmobBanner(modifier= Modifier.padding(vertical = 10.dp))
                         }
                         item {
                             if (it.result.filter { !it.verified }.isNotEmpty()) {
@@ -249,8 +258,11 @@ fun NotesItem(notes: NotesModel, viewModel: NotesViewModel, navController: NavCo
                 .size(140.dp)
                 .clickable {
                     viewModel.notesId.value = notes.id
-                    navController.navigate(Screen.ViewNotes.Landing.route + "/${notes.id}")
                     viewModel.registerView(notes.id)
+                    showInterstialAd(context as Activity) {
+                        navController.navigate(Screen.ViewNotes.Landing.route + "/${notes.id}")
+
+                    }
                 },
             shape = RoundedCornerShape(20.dp),
             border = BorderStroke(.5.dp, getHorizontalGradient())

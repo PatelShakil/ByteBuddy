@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -41,13 +44,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
+import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.HorizontalBrush
 import com.shakilpatel.notesapp.common.MainColor
 import com.shakilpatel.notesapp.common.Resource
@@ -61,12 +72,15 @@ import com.shakilpatel.notesapp.data.models.learning.SemModel
 import com.shakilpatel.notesapp.data.notification.Cons
 import com.shakilpatel.notesapp.data.notification.NotificationData
 import com.shakilpatel.notesapp.data.notification.PushNotification
+import com.shakilpatel.notesapp.ui.ads.AdmobBanner
 import com.shakilpatel.notesapp.ui.main.home.notes.NotesViewModel
 import com.shakilpatel.notesapp.ui.nav.Screen
 import com.shakilpatel.notesapp.ui.splash.findActivity
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.yield
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -74,66 +88,126 @@ fun HomeScreen(
     navController: NavController,
     onBack: () -> Unit
 ) {
-//    val notesList = viewModel.notesCol.collectAsState()
-    val context = LocalContext.current
-    ByteBuddyTheme {
-        BackHandler {
-            onBack()
-        }
-        val coursesList = viewModel.courses.collectAsState()
-        coursesList.value.let {
-            when (it) {
-                is Resource.Success -> {
-                    LazyColumn(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .navigationBarsPadding()
-                            .background(
-                                HorizontalBrush
-                            )
-                    ) {
-                        items(it.result) {
-                            Sp(10.dp)
-                            CourseCard(title = it.name, it, notesViewModel, navController)
-                            Sp(10.dp)
-                        }
-                        item {
-                            Sp(15.dp)
-                            ContactUsCard() {
-                                navController.navigate(Screen.Main.Profile.AboutUs.route)
+        ByteBuddyTheme {
+            BackHandler {
+                onBack()
+            }
+            val coursesList = viewModel.courses.collectAsState()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding()
+                    .background(
+                        HorizontalBrush
+                    )
+            ) {
+                viewModel.banners.collectAsState().value.let {
+                when (it) {
+                    is Resource.Loading -> {
+                        ProgressBarIndicator()
+                    }
+
+                    is Resource.Success -> {
+                        if (it.result.isNotEmpty()) {
+                            val uriHandler = LocalUriHandler.current
+                            val state = rememberPagerState(initialPage = 0)
+                            LaunchedEffect(Unit) {
+                                while (true) {
+                                    yield()
+                                    delay(2600)
+                                    state.animateScrollToPage(
+                                        page = (state.currentPage + 1) % (state.pageCount)
+                                    )
+                                }
+                            }
+
+                            HorizontalPager(
+                                count = it.result.size,
+                                state = state
+                            ) { page ->
+                                val item =
+                                    it.result.sortedBy { it.position }[page]
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(220.dp)
+                                        .padding(20.dp),
+                                    elevation = CardDefaults.cardElevation(4.dp),
+                                    shape = RoundedCornerShape(20.dp),
+                                    onClick = {
+                                        uriHandler.openUri(item.url)
+                                    }
+                                ) {
+                                    AsyncImage(
+                                        item.image,
+                                        "",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.FillBounds
+                                    )
+                                }
                             }
                         }
                     }
 
-                }
-
-                is Resource.Loading -> {
-                }
-
-                is Resource.Failure -> {
-                    SnackBarCus(msg = it.errorMsgBody)
-                }
-
-                else -> {
-
-                    ProgressBarIndicator()
+                    is Resource.Failure -> {}
+                    else -> {}
                 }
             }
+
+                coursesList.value.let {
+                when (it) {
+                    is Resource.Success -> {
+                        LazyColumn(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier= Modifier.fillMaxWidth()
+                        ) {
+
+                            item{
+                                AdmobBanner(modifier= Modifier.fillMaxWidth())
+                            }
+
+
+                            items(it.result) {
+                                CourseCard(title = it.name, it, notesViewModel, navController)
+                                Sp(10.dp)
+                            }
+                            item {
+                                Sp(15.dp)
+                                ContactUsCard() {
+                                    navController.navigate(Screen.Main.Profile.AboutUs.route)
+                                }
+                            }
+                        }
+
+                    }
+
+                    is Resource.Loading -> {
+                    }
+
+                    is Resource.Failure -> {
+                        SnackBarCus(msg = it.errorMsgBody)
+                    }
+
+                    else -> {
+
+                        ProgressBarIndicator()
+                    }
+                }
+            }
+            //    var bcaList by remember{ mutableStateOf(mutableListOf<NotesModel>()) }
+            //    var plList by remember{ mutableStateOf(mutableListOf<NotesModel>()) }
+            //    notesList.value.let {
+            //        when(it){
+            //            is Resource.Success ->{
+            //                bcaList = it.result.filter { it.courseId.contains("BCA") }.toMutableList()
+            //                plList = it.result.filter { it.courseId.contains("Programming Language") }.toMutableList()
+            //            }
+            //            else ->{}
+            //        }
+            //    }
+
+
         }
-//    var bcaList by remember{ mutableStateOf(mutableListOf<NotesModel>()) }
-//    var plList by remember{ mutableStateOf(mutableListOf<NotesModel>()) }
-//    notesList.value.let {
-//        when(it){
-//            is Resource.Success ->{
-//                bcaList = it.result.filter { it.courseId.contains("BCA") }.toMutableList()
-//                plList = it.result.filter { it.courseId.contains("Programming Language") }.toMutableList()
-//            }
-//            else ->{}
-//        }
-//    }
-
-
     }
 }
 
@@ -142,23 +216,23 @@ fun ContactUsCard(onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(horizontal = 20.dp)
+            .padding(bottom = 20.dp)
+            .padding(top = 10.dp)
             .clickable {
                 onClick()
             },
-        elevation = CardDefaults.cardElevation(4.dp),
+        elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors(
-            MainColor
+            Color(0xFFFEFEFE)
         )
     ) {
-        Text(
-            "Contact @Developer",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            color = TextColor
+        Image(
+            painterResource(R.drawable.powered_by),
+            "",
+            modifier= Modifier.fillMaxSize()
+                .padding(5.dp),
+            contentScale = ContentScale.Crop
         )
     }
 }

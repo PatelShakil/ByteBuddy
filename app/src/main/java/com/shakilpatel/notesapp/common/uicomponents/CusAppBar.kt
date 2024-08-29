@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Icon
@@ -177,13 +179,12 @@ fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthVi
                                 style = MaterialTheme.typography.titleSmall,
                                 fontSize = 9.sp,
                                 modifier = Modifier
-                                    .background(RedColor, CircleShape)
+                                    .background(RedColor,CircleShape)
+                                    .padding(horizontal = 4.dp)
                                     .clip(
                                         CircleShape
                                     )
-                                    .padding(1.dp)
-                                    .padding(horizontal = 3.dp)
-                                    .align(
+                                    . align(
                                         Alignment.TopEnd
                                     ),
                                 color = WhiteColor
@@ -283,7 +284,8 @@ fun SubjectAppBar(title: String, navController: NavController) {
         modifier = Modifier.fillMaxWidth(),
         navigationIcon = {
             Sp(w = 10.dp)
-            Icon(Icons.Default.ArrowBack, "", tint = White,
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack, "", tint = White,
                 modifier = Modifier.clickable {
                     navController.popBackStack()
                 })

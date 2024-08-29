@@ -1,5 +1,6 @@
 package com.shakilpatel.notesapp.ui.main.home.notes
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -26,6 +28,7 @@ import com.shakilpatel.notesapp.common.TextColor
 import com.shakilpatel.notesapp.common.getHorizontalGradient
 import com.shakilpatel.notesapp.common.uicomponents.Sp
 import com.shakilpatel.notesapp.common.uicomponents.SubjectAppBar
+import com.shakilpatel.notesapp.ui.ads.showInterstialAd
 import com.shakilpatel.notesapp.ui.nav.Screen
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 
@@ -36,6 +39,7 @@ fun SubjectScreen(course: String, viewModel: NotesViewModel, navController: NavC
         when (it) {
             is Resource.Success -> {
                 ByteBuddyTheme {
+
                     Column(modifier = Modifier
                         .fillMaxSize()
                         .background(HorizontalBrush)) {
@@ -63,6 +67,7 @@ fun SubjectScreen(course: String, viewModel: NotesViewModel, navController: NavC
                                         ) {
                                             viewModel.setSubject(subjectModel.id)
                                             navController.navigate(Screen.Main.Home.Notes.route + "/${subjectModel.subjectName}/${course}")
+
                                         }
                                         Sp(10.dp)
                                     }

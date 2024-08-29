@@ -2,6 +2,7 @@ package com.shakilpatel.notesapp
 
 import android.os.Bundle
 import android.util.Log
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -32,11 +35,13 @@ import com.shakilpatel.notesapp.ui.auth.AuthViewModel
 import com.shakilpatel.notesapp.ui.nav.NotesAppNavHost
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Arrays
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MobileAds.initialize(this)
         setContent {
             ByteBuddyTheme {
                 // A surface container using the 'background' color from the theme

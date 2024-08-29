@@ -123,6 +123,9 @@ dependencies {
     implementation ("com.google.firebase:firebase-storage-ktx")
     implementation ("com.google.firebase:firebase-messaging-ktx")
     implementation ("com.google.firebase:firebase-crashlytics-ktx")
+    implementation ("com.google.android.gms:play-services-ads:23.3.0") // Replace with the latest version
+
+
 
     //constraintLayout
     implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")

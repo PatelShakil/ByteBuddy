@@ -254,13 +254,14 @@ fun ProfileTextFieldDisabled(
 ) {
     OutlinedTextField(
         value = value, onValueChange = {},
-        modifier = modifier.fillMaxWidth()
-            .focusable(false),
+        modifier = modifier.fillMaxWidth(),
         readOnly = true,
         label = { Text(label, style = MaterialTheme.typography.titleSmall, color = MainColor) },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             unfocusedBorderColor = MainColor,
             unfocusedLabelColor = MainColor,
+            focusedLabelColor = MainColor,
+            focusedBorderColor = MainColor
         )
     )
 

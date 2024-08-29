@@ -33,7 +33,7 @@
                     android:host="example.com"/>
             </intent-filter>
         </activity>
-        <service
+       <service
             android:name=".data.notification.FirebaseService"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.Send">
@@ -42,6 +42,14 @@
                 <action android:name="com.google.android.c2dm.permission.Recieve" />
             </intent-filter>
         </service>
+        <meta-data
+        android:name="com.google.android.gms.ads.APPLICATION_ID"
+        android:value="@string/admob_app_id"/>
+        <property
+            android:name="android.adservices.AD_SERVICES_CONFIG"
+            tools:replace="android:resource"
+            android:resource="@xml/gma_ad_services_config" />
+
     </application>
 
 </manifest>
