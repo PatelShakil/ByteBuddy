@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:name=".common.MyApplication"
         android:theme="@style/Theme.NotesApp"
-        tools:targetApi="31">
+        tools:targetApi="35">
         <activity
             android:windowSoftInputMode="adjustResize"
             android:name=".MainActivity"

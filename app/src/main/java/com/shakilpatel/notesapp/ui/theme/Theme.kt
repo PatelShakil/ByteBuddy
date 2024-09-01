@@ -59,7 +59,7 @@ fun ByteBuddyTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = MainColor.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
 

@@ -114,7 +114,7 @@ fun HomeScreen(
                             LaunchedEffect(Unit) {
                                 while (true) {
                                     yield()
-                                    delay(2600)
+                                    delay(3000)
                                     state.animateScrollToPage(
                                         page = (state.currentPage + 1) % (state.pageCount)
                                     )

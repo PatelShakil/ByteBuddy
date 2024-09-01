@@ -7,8 +7,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.messaging.FirebaseMessaging
 import com.shakilpatel.notesapp.common.Resource
 import com.shakilpatel.notesapp.data.models.learning.CollegeModel
@@ -19,6 +21,7 @@ import com.shakilpatel.notesapp.data.repo.CommonRepo
 import com.shakilpatel.notesapp.ui.nav.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -188,6 +191,20 @@ class AuthViewModel @Inject constructor(
     fun getUserModel(uid: String = auth.uid.toString(), onResult: (UserModel) -> Unit) {
         commonRepo.getUserModel {
             onResult(it)
+        }
+    }
+
+    fun forgotPassword(email: String)=viewModelScope.launch {
+        try {
+            auth.sendPasswordResetEmail(email)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Password Reset Link Sent", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(context, it.localizedMessage, Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: FirebaseAuthInvalidUserException) {
+            Toast.makeText(context, "User Not Found", Toast.LENGTH_SHORT).show()
         }
     }
 }

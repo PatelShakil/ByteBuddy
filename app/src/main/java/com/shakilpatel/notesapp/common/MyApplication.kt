@@ -4,59 +4,48 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import android.view.WindowManager
+import com.google.firebase.BuildConfig
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class MyApplication : Application() {
     private var context: Context? = null
-//    val ONESIGNAL_APP_ID = "7e70f898-3b02-4461-b6d3-c6388da1c10b"
+
+    //    val ONESIGNAL_APP_ID = "7e70f898-3b02-4461-b6d3-c6388da1c10b"
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
         val db = FirebaseFirestore.getInstance()
-//        Firebase.firestore.setPersistenceEnabled(true)
-//        val settings = firestoreSettings {
-//            // Use memory cache
-//            setLocalCacheSettings(memoryCacheSettings {
-//            })
-//            // Use persistent disk cache (default)
-//            setLocalCacheSettings(persistentCacheSettings {
-//            })
-//        }
-//        db.firestoreSettings = settings
 
-// The default cache size threshold is 100 MB. Configure "setCacheSizeBytes"
-// for a different threshold (minimum 1 MB) or set to "CACHE_SIZE_UNLIMITED"
-// to disable clean-up.
-//        val settings = FirebaseFirestoreSettings.Builder()
-//            .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
-//            .build()
-//        db.firestoreSettings = settings
-//        val scoresRef = Firebase.database.reference
-//        scoresRef.keepSynced(true)
-        // Verbose Logging set to help debug issues, remove before releasing your app.
-//        OneSignal.Debug.logLevel = LogLevel.VERBOSE
+        val settings = FirebaseFirestoreSettings.Builder()
+            .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+            .build()
+        db.firestoreSettings = settings
 
-        // OneSignal Initialization
-//        OneSignal.initWithContext(this, ONESIGNAL_APP_ID)
 
-        // requestPermission will show the native Android notification permission prompt.
-        // NOTE: It's recommended to use a OneSignal In-App Message to prompt instead.
-//        CoroutineScope(Dispatchers.IO).launch {
-//            OneSignal.Notifications.requestPermission(true)
-//        }
-        setupActivityListener()
+        val scoresRef = Firebase.database.reference
+        scoresRef.keepSynced(true)
+
+        //set below condition that the block can execute only if the release version of app was
+
+        if (!BuildConfig.DEBUG) {
+            setupActivityListener()
+        }
     }
 
     private fun setupActivityListener() {
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
                 /*TODO MAKE THIS FLAGS ENABLE TO SECURE APP FROM TAKING SCREENSHOT AND SCREENCAST*/
-//                activity.window.setFlags(
-//                    WindowManager.LayoutParams.FLAG_SECURE,
-//                    WindowManager.LayoutParams.FLAG_SECURE
-//                )
+                activity.window.setFlags(
+                    WindowManager.LayoutParams.FLAG_SECURE,
+                    WindowManager.LayoutParams.FLAG_SECURE
+                )
             }
 
             override fun onActivityStarted(activity: Activity) {}

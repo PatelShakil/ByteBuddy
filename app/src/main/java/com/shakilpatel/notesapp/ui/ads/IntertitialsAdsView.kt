@@ -10,7 +10,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 fun showInterstialAd(context : Activity,onDone : () -> Unit) {
     InterstitialAd.load(
         context,
-        "ca-app-pub-6374179772242710/5275987450", //Change this with your own AdUnitID!
+        "ca-app-pub-5228160324628992/1322507998", //Change this with your own AdUnitID!
         AdRequest.Builder().build(),
         object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
