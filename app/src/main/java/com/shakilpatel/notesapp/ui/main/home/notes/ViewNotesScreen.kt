@@ -43,6 +43,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -90,92 +91,46 @@ import com.shakilpatel.notesapp.ui.main.create.TabIndicator
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun ViewNotesScreen(notesId: String, viewModel: NotesViewModel, navController: NavController) {
     ByteBuddyTheme {
         Column {
             HideSystemBars()
-            TabLayout(notesId, viewModel, navController)
-//            var curState by remember{ mutableStateOf("Text") }
-//            LaunchedEffect(key1 = true){
-//                viewModel.getNote(notesId){
-//                    viewModel.notes.value = it
-//                }
-//            }
-//            viewModel.notes.collectAsState().value.let {
-//                when (it) {
-//                    is Resource.Success -> {
-//                        viewModel.curNote.value = it.result
-//                        Row(modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(vertical = 5.dp),
-//                            horizontalArrangement = Arrangement.SpaceAround){
-//                            CheckButton(title = "Text", isSelected = curState == "Text") {
-//                                curState = "Text"
-//                            }
-//                            val context = LocalContext.current
-//                            CheckButton(title = "PDF", isSelected = curState == "PDF") {
-//                                context.startActivity(PdfViewerActivity.launchPdfFromUrl(
-//                                    context,
-//                                    it.result.pdfFile,
-//                                    it.result.title,
-//                                    "Downloads",
-//                                    false
-//                                ))
-//                                curState = "Text"
-//                            }
-//
-//                        }
-//                        if(curState == "Text"){
-//                            TextScreen(it.result,viewModel = viewModel)
-//                        }
-//                    }
-//                    else -> {}
-//                }
-//            }
-
-
-        }
-    }
-}
-@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
-@Composable
-fun TabLayout(notesId: String, viewModel: NotesViewModel, navController: NavController) {
-    val note = remember { mutableStateOf(NotesModel()) }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        viewModel.getNote(notesId) {
-            when (it) {
-                is Resource.Success -> {
-                    note.value = it.result
+            val isRotationChange by rememberSaveable {
+                mutableStateOf(false)
+            }
+            LaunchedEffect(isRotationChange) {
+                Log.d("TAG", "ViewNotesScreen: $notesId")
+//                viewModel.getNote(notesId)
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                val pagerState = rememberPagerState(
+                    initialPage = 0,
+                    initialPageOffsetFraction = 0f
+                ) {
+                    // provide pageCount
+                    if (viewModel.curNote.value.text.isEmpty()) 1 else 2
                 }
+                Column {
+                    Tabs(
+                        pagerState = pagerState, modifier = Modifier.height(40.dp),
+                        if (viewModel.curNote.value.text.isEmpty()) listOf("PDF")
+                        else listOf("Text", "PDF")
+                    )
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        TabsContent(pagerState = pagerState, viewModel, navController)
+                    }
 
-                else -> {}
+                }
             }
-
-        }
-        val pagerState = rememberPagerState(
-            initialPage = 0,
-            initialPageOffsetFraction = 0f
-        ) {
-            // provide pageCount
-            if (note.value.text.isEmpty()) 1 else 2
-        }
-        Column {
-            Tabs(
-                pagerState = pagerState, modifier = Modifier.height(40.dp),
-                if (note.value.text.isEmpty()) listOf("PDF")
-                else listOf("Text", "PDF")
-            )
-            Box(modifier = Modifier.fillMaxWidth()) {
-                TabsContent(pagerState = pagerState, viewModel, navController)
-            }
-
         }
     }
 }
+
 @Composable
 fun CheckButton(title:String,isSelected : Boolean, onClick:()->Unit) {
     Box(
@@ -274,17 +229,15 @@ fun Tabs(
 @ExperimentalPagerApi
 @Composable
 fun TabsContent(pagerState: PagerState, viewModel: NotesViewModel, navController: NavController) {
-    var notes = NotesModel()
     viewModel.notes.collectAsState().value.let {
         when (it) {
             is Resource.Success -> {
-                notes = it.result
-                viewModel.curNote.value = notes
+                viewModel.curNote.value = it.result
 
                 HorizontalPager(state = pagerState, userScrollEnabled = false) { page ->
                     when (page) {
                             0 -> {
-                                TextScreen(notes,viewModel = viewModel)
+                                TextScreen(it.result,viewModel = viewModel)
 
                             }
 
@@ -387,13 +340,12 @@ fun PDFScreen(viewModel: NotesViewModel, navController: NavController) {
 //                            })
 
 
-            var isLoadingPdf = pdfState.isLoaded
             var isConfirmCancel by remember {
                 mutableStateOf(false)
             }
 
 
-            if(!isLoadingPdf){
+            if(!pdfState.isLoaded){
                 ProgressBarCus(onDismiss = {
                                            isConfirmCancel = true
                 }, progress = pdfState.loadPercent / 100.toFloat())
@@ -414,13 +366,11 @@ fun PDFScreen(viewModel: NotesViewModel, navController: NavController) {
                 ConfirmationDialog(msg = "Are you want to cancel loading PDF ?", onDismiss = {
                     isConfirmCancel = !isConfirmCancel
                 }) {
-                    isLoadingPdf = true
                     isConfirmCancel = !isConfirmCancel
                     pdfState.close()
+                    navController.popBackStack()
                 }
             }
-            if (pdfState.isLoaded)
-                isLoadingPdf = !isLoadingPdf
         }
     }
 }

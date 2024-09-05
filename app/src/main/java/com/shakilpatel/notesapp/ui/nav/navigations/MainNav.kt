@@ -18,6 +18,7 @@ import com.shakilpatel.notesapp.ui.main.profile.ProfileScreen
 import com.shakilpatel.notesapp.ui.main.profile.SavedContentScreen
 import com.shakilpatel.notesapp.ui.main.profile.UploadContentScreen
 import com.shakilpatel.notesapp.ui.nav.Screen
+import com.shakilpatel.notesapp.ui.nav.getViewModelInstance
 import com.shakilpatel.notesapp.ui.nav.sharedViewModel
 
 fun NavGraphBuilder.MainNav(navController: NavController, onBack: () -> Unit) {
@@ -77,7 +78,7 @@ fun NavGraphBuilder.HomeNav(navController: NavController, onBack: () -> Unit) {
         ) {
             SubjectScreen(
                 course = it.arguments?.getString("course")!!,
-                viewModel = it.sharedViewModel<NotesViewModel>(navController = navController),
+                viewModel = navController.getViewModelInstance(navBackStackEntry = it, route =Screen.Main.Home.Landing.route),
                 navController = navController
             )
         }
@@ -94,7 +95,7 @@ fun NavGraphBuilder.HomeNav(navController: NavController, onBack: () -> Unit) {
             NotesScreen(
                 it.arguments?.getString("subjectName")!!,
                 it.arguments?.getString("courseName")!!,
-                viewModel = it.sharedViewModel(navController = navController),
+                viewModel = navController.getViewModelInstance(navBackStackEntry = it, route =Screen.Main.Home.Landing.route),
                 navController = navController
             )
         }

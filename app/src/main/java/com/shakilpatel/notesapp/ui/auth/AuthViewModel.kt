@@ -182,7 +182,6 @@ class AuthViewModel @Inject constructor(
 
     fun doSignup(user: UserModel,pass: String, navController: NavController) {
         _signupResult.value = Resource.Loading
-        user.uid = auth.uid.toString()
         authRepo.doSignup(user,pass) {
             _signupResult.value = it
         }

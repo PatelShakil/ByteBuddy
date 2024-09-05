@@ -110,8 +110,9 @@ class AuthRepo @Inject constructor(
         auth.createUserWithEmailAndPassword(user.email, pass)
             .addOnSuccessListener {
                 if(it.user != null) {
+                    user.uid = it.user?.uid.toString()
                     db.collection("users")
-                        .document(user.uid)
+                        .document(it?.user?.uid!!)
                         .set(user)
                         .addOnCompleteListener {
                             if (it.isSuccessful) {

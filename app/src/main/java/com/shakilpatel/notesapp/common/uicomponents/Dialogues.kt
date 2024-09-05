@@ -1,13 +1,19 @@
 package com.shakilpatel.notesapp.common.uicomponents
 
 import androidx.compose.animation.core.snap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -41,6 +48,7 @@ import com.shakilpatel.notesapp.R
 import com.shakilpatel.notesapp.common.Cons
 import com.shakilpatel.notesapp.common.HorizontalBrush
 import com.shakilpatel.notesapp.common.MainColor
+import com.shakilpatel.notesapp.common.RedColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -48,17 +56,37 @@ import kotlinx.coroutines.launch
 @Composable
 fun UpdateDialogue(latestVersion: String, onBack: () -> Unit) {
     val context = LocalContext.current
-    AlertDialog(onDismissRequest = { /*TODO*/ },
-        confirmButton = {
-            var updateLink by remember { mutableStateOf("") }
 
-            Button(onClick = {
-                FirebaseDatabase.getInstance().reference.child("updateLink")
+    Dialog(onDismissRequest = { /*TODO*/ },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Card(
+            modifier= Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            shape = RoundedCornerShape(15)
+        ){
+            Column(
+                modifier= Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)
+            ){
+                val openUri = LocalUriHandler.current
+
+                Image(
+                    painterResource(id = R.drawable.play_logo),
+                    ""
+                )
+                Spacer(Modifier.height(10.dp))
+
+                var message by remember { mutableStateOf("") }
+                FirebaseDatabase.getInstance().reference.child("message")
                     .addValueEventListener(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
                             if (snapshot.exists()) {
-                                updateLink = snapshot.value.toString()
-                                Cons.gotoUrl(updateLink, context)
+                                message = snapshot.value.toString()
                             }
 
                         }
@@ -67,35 +95,53 @@ fun UpdateDialogue(latestVersion: String, onBack: () -> Unit) {
                         }
 
                     })
-            }) {
-                Text("Update Now To $latestVersion version")
+                Text(message)
 
-            }
-        },
-        dismissButton = {
-            Button(onClick = {
-                onBack()
-            }) {
-                Text("Close App")
-            }
-        },
-        title = {
-            var message by remember { mutableStateOf("") }
-            FirebaseDatabase.getInstance().reference.child("message")
-                .addValueEventListener(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            message = snapshot.value.toString()
-                        }
 
+                Spacer(Modifier.height(10.dp))
+
+                Row(
+                    modifier= Modifier.fillMaxWidth()
+                ){
+                    Button(
+                        onClick = onBack,
+                        colors = ButtonDefaults.buttonColors(
+                            RedColor
+                        ),
+                        modifier= Modifier.weight(1f)
+                    ){
+                        Text("Close")
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Button(
+                        onClick = {
+                            FirebaseDatabase.getInstance().reference.child("updateLink")
+                                .addValueEventListener(object : ValueEventListener {
+                                    override fun onDataChange(snapshot: DataSnapshot) {
+                                        if (snapshot.exists()) {
+                                            openUri.openUri(snapshot.value.toString())
+                                        }
+
+                                    }
+
+                                    override fun onCancelled(error: DatabaseError) {
+                                    }
+
+                                })
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            Color(0xFF5FAC65)
+                        ),
+                        modifier= Modifier.weight(1f)
+                    ){
+                        Text("Update")
                     }
 
-                    override fun onCancelled(error: DatabaseError) {
-                    }
+                }
 
-                })
-            Text(message)
-        })
+            }
+        }
+    }
 }
 
 @Composable

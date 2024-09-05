@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,6 +41,8 @@ import com.shakilpatel.notesapp.ui.main.feed.error.FAQViewModel
 import com.shakilpatel.notesapp.ui.main.home.notes.NotesItem
 import com.shakilpatel.notesapp.ui.main.home.notes.NotesViewModel
 import com.shakilpatel.notesapp.ui.main.home.notes.Tabs
+import com.shakilpatel.notesapp.ui.nav.Screen
+import com.shakilpatel.notesapp.ui.nav.getViewModelInstance
 import com.shakilpatel.notesapp.ui.theme.ByteBuddyTheme
 
 @Composable
@@ -47,6 +50,7 @@ fun SavedContentScreen(viewModel: ProfileViewModel, navController: NavController
 
     ByteBuddyTheme {
         LaunchedEffect(true) {
+            Log.d("TAG", "Saved Notes: " + navController.currentBackStackEntry?.destination?.route)
             viewModel.getUserModel()
         }
         viewModel.user.collectAsState().value.let {
@@ -113,12 +117,13 @@ fun ProfileTabsContent(pagerState: PagerState, navController: NavController) {
     HorizontalPager(state = pagerState) { page ->
         when (page) {
             0 -> {
-                FaqSampleScreen(viewModel = hiltViewModel(),navController)
+                FaqSampleScreen(viewModel = hiltViewModel(), navController)
             }
 
             1 -> {
                 NotesSampleScreen(
-                    viewModel = hiltViewModel(), navController
+                    viewModel = navController.getViewModelInstance(navController.currentBackStackEntry!!,
+                        Screen.Main.Home.Landing.route), navController
                 )
             }
 
@@ -131,48 +136,54 @@ fun ProfileTabsContent(pagerState: PagerState, navController: NavController) {
 fun NotesSampleScreen(
     viewModel: NotesViewModel, navController: NavController
 ) {
-    val user = remember { mutableStateOf(UserModel()) }
-    viewModel.getUserModel {
-        user.value = it
+    LaunchedEffect(key1 = true) {
+        viewModel.getSavedNotes()
     }
     Column(modifier = Modifier.fillMaxSize()) {
-        if (user.value.saved.notes.isEmpty()) {
-            OnNoDataFound(msg = "No Such notes saved")
-        }
-        LazyVerticalGrid(modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 20.dp),
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.SpaceAround,
-            content = {
-                items(user.value.saved.notes) {
-                    val note = remember { mutableStateOf(NotesModel()) }
-                    viewModel.getNote(it) {
-                        when (it) {
-                            is Resource.Success -> {
-                                note.value = it.result
 
-                            }
-
-                            else -> {}
-                        }
-                    }
-                    if (note.value != NotesModel()) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            NotesItem(notes = note.value, viewModel, navController)
-                        }
-                    }
-
+        viewModel.savedNotes.collectAsState().value.let {
+            when(it) {
+                is Resource.Loading -> {
+                    CircularProgressIndicator()
                 }
-            })
+                is Resource.Success -> {
+                    if (it.result.isEmpty()) {
+                        OnNoDataFound("No saved notes available")
+                    } else {
+                        LazyVerticalGrid(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(vertical = 20.dp),
+                            columns = GridCells.Fixed(2),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
+                            items(it.result) { note ->
+                                if (note != NotesModel()) {
+                                    Box(
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        NotesItem(notes = note, viewModel, navController)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                is Resource.Failure -> {
+                    OnNoDataFound(msg = it.errorMsgBody)
+                }
+                else -> {
+                }
+            }
+
+        }
+
     }
 
 }
 
 @Composable
-fun FaqSampleScreen(viewModel: FAQViewModel,navController: NavController) {
+fun FaqSampleScreen(viewModel: FAQViewModel, navController: NavController) {
     Sp(h = 5.dp)
     var user by remember { mutableStateOf(UserModel()) }
     viewModel.getUserModel {

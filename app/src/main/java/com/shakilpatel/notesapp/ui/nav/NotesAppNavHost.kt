@@ -158,3 +158,17 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navControll
     }
     return hiltViewModel(parentEntry)
 }
+
+@Composable
+inline fun <reified VM : ViewModel> NavController.getViewModelInstance(navBackStackEntry: NavBackStackEntry, route: String): VM {
+    val parentEntry = getParent(navBackStackEntry, route)
+    return hiltViewModel(parentEntry)
+}
+
+@Composable
+fun NavController.getParent(navBackStackEntry: NavBackStackEntry, route: String): NavBackStackEntry {
+    val parentEntry = remember(navBackStackEntry) {
+        this.getBackStackEntry(route)
+    }
+    return parentEntry
+}

@@ -192,24 +192,24 @@ fun SignupScreen(viewModel: AuthViewModel, navController: NavController) {
                                     label = "Create an account as $name",
                                     isEnable = (pass == confirmPass) && email.isNotEmpty() && pass.isNotEmpty() && confirmPass.isNotEmpty() && name.isNotEmpty() && dob.isNotEmpty() && gender.isNotEmpty() && education.courseName.isNotEmpty() && college.name.isNotEmpty()
                                 ) {
-                                    viewModel.doSignup(
-                                        UserModel(
-                                            "",
-                                            name,
-                                            email,
-                                            dob,
-                                            gender,
-                                            false,
-                                            false,
-                                            profileImg,
-                                            education,
-                                            college,
-                                            System.currentTimeMillis(),
-                                            "",
-                                            0,
-                                            SavedModel(),
-                                            emptyList()
-                                        ), pass, navController
+                                        viewModel.doSignup(
+                                            UserModel(
+                                                "",
+                                                name,
+                                                email,
+                                                dob,
+                                                gender,
+                                                false,
+                                                false,
+                                                profileImg,
+                                                education,
+                                                college,
+                                                System.currentTimeMillis(),
+                                                "",
+                                                0,
+                                                SavedModel(),
+                                                emptyList()
+                                            ), pass, navController
                                     )
                                 }
                             }

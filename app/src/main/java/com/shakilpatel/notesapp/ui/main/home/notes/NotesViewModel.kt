@@ -3,11 +3,14 @@ package com.shakilpatel.notesapp.ui.main.home.notes
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.easy.translator.EasyTranslator
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.shakilpatel.notesapp.common.Resource
 import com.shakilpatel.notesapp.data.models.learning.CourseModel
 import com.shakilpatel.notesapp.data.models.learning.NotesModel
@@ -19,6 +22,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.util.Locale
 import javax.inject.Inject
 
@@ -27,8 +31,12 @@ class NotesViewModel @Inject constructor(
     private val notesRepo: NotesRepo,
     private val commonRepo: CommonRepo,
     private val context: Context,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val db : FirebaseFirestore
 ) : ViewModel() {
+
+
+
 
     private val _course = MutableStateFlow("")
     val course = _course.asStateFlow()
@@ -40,9 +48,35 @@ class NotesViewModel @Inject constructor(
     private val _subject = MutableStateFlow("")
     var subject = _subject.asStateFlow()
 
+    private val _savedNotes = MutableStateFlow<Resource<List<NotesModel>>?>(null)
+    val savedNotes = _savedNotes.asStateFlow()
+
+    fun getSavedNotes(uid: String = auth.uid.toString()) = viewModelScope.launch {
+        _savedNotes.value = Resource.Loading
+        try {
+            val userSnapshot = db.collection("users").document(uid).get().await()
+            val list = userSnapshot.toObject(UserModel::class.java)?.saved?.notes
+            val notesList = mutableListOf<NotesModel>()
+            if (!list.isNullOrEmpty()) {
+                list.forEach { noteId ->
+                    val noteSnapshot = db.collection("notes").document(noteId).get().await()
+                    noteSnapshot.toObject(NotesModel::class.java)?.let { notesList.add(it) }
+                }
+                _savedNotes.value = Resource.Success(notesList)
+            } else {
+                _savedNotes.value = Resource.Success(emptyList())  // Handle empty notes
+            }
+        } catch (e: Exception) {
+            _savedNotes.value = Resource.Failure(e,e.message ?: "Unknown Error")
+        }
+    }
+
+
     fun setSubject(value: String) {
         _subject.value = value
     }
+
+
 
     var notesId = MutableStateFlow<String>("")
     var curNote = mutableStateOf(NotesModel())
@@ -126,11 +160,20 @@ class NotesViewModel @Inject constructor(
 
 
     var notes = MutableStateFlow<Resource<NotesModel>?>(null)
-    fun getNote(notesId: String, onResult: (Resource<NotesModel>) -> Unit) = viewModelScope.launch {
-        commonRepo.getNotesModel(notesId) {
-            onResult(it)
-            notes.value = it
-        }
+    fun getNote(notesId: String) = viewModelScope.launch {
+        notes.value = Resource.Loading
+        db.collection("notes")
+            .document(notesId)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    return@addSnapshotListener
+                }
+                if (value != null) {
+                    if (value.exists()) {
+                        notes.value = Resource.Success(value.toObject(NotesModel::class.java)!!)
+                    }
+                }
+            }
     }
 
     private val _notesCol = MutableStateFlow<Resource<List<NotesModel>>?>(null)

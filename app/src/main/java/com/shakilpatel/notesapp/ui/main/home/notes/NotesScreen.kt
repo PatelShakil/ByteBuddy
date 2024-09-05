@@ -260,8 +260,8 @@ fun NotesItem(notes: NotesModel, viewModel: NotesViewModel, navController: NavCo
                     viewModel.notesId.value = notes.id
                     viewModel.registerView(notes.id)
                     showInterstialAd(context as Activity) {
+                        viewModel.getNote(notes.id)
                         navController.navigate(Screen.ViewNotes.Landing.route + "/${notes.id}")
-
                     }
                 },
             shape = RoundedCornerShape(20.dp),
