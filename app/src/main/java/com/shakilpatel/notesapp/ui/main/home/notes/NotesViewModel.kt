@@ -181,21 +181,9 @@ class NotesViewModel @Inject constructor(
         get() = _notesCol
 
     fun getNotesCol(subject: String, course: String = "") = viewModelScope.launch {
-        _notesCol.value = Resource.Loading
+//        _notesCol.value = Resource.Loading
         notesRepo.getNotesCol(subject, course) {
-            _notesCol.value = when (it) {
-                is Resource.Success -> {
-                    it
-                }
-
-                is Resource.Failure -> {
-                    it
-                }
-
-                else -> {
-                    Resource.Loading
-                }
-            }
+            _notesCol.value = it
         }
     }
 

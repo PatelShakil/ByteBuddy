@@ -67,7 +67,7 @@ fun FAQTabContent(viewModel: CreateViewModel, navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TabHeader(tabName = "Upload Frequently Asked Question")
+            TabHeader(tabName = "Upload FAQs")
 
             val context = LocalContext.current
             var eTitle by remember { mutableStateOf("") }

@@ -66,6 +66,7 @@ fun SubjectScreen(course: String, viewModel: NotesViewModel, navController: NavC
                                             name = subjectModel.subjectName
                                         ) {
                                             viewModel.setSubject(subjectModel.id)
+                                            viewModel.getNotesCol(subjectModel.subjectName, course)
                                             navController.navigate(Screen.Main.Home.Notes.route + "/${subjectModel.subjectName}/${course}")
 
                                         }

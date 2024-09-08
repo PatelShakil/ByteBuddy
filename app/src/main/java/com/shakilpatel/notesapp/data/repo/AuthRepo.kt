@@ -33,22 +33,6 @@ class AuthRepo @Inject constructor(
                             it.exception!!.localizedMessage
                         )
                     )
-                    if (it.exception!!.localizedMessage == "There is no user record corresponding to this identifier. The user may have been deleted.") {
-                        auth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener { signup ->
-                                if (signup.isSuccessful) {
-                                    loginResultCallback(Resource.Success(true))
-                                }
-                                if (signup.exception != null) {
-                                    loginResultCallback(
-                                        Resource.Failure(
-                                            signup.exception!!,
-                                            signup.exception!!.localizedMessage
-                                        )
-                                    )
-                                }
-                            }
-                    }
                 }
             }
     }

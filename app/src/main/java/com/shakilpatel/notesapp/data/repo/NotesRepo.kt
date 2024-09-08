@@ -278,6 +278,13 @@ class NotesRepo @Inject constructor(
                         list.add(note.toObject(NotesModel::class.java)!!)
                     }
                     onResult(Resource.Success(list))
+                }else{
+                    onResult(
+                        Resource.Failure(
+                            java.lang.Exception("No Data Found"),
+                            "No Such Notes available at this time."
+                        )
+                    )
                 }
             } else {
                 onResult(
