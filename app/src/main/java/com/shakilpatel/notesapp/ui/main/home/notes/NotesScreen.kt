@@ -98,7 +98,7 @@ fun NotesScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MainColor)
-                .padding(10.dp)
+                .padding( horizontal = 10.dp)
         ) {
             val scope = rememberCoroutineScope()
             tabList.forEachIndexed { index, s ->
@@ -107,10 +107,10 @@ fun NotesScreen(
                         .weight(1f)
                         .padding(horizontal = 10.dp),
                     colors = CardDefaults.cardColors(
-                        if (state.currentPage == index) MainColor else Color.White
+                        if (state.currentPage == index) Color.White else MainColor
                     ),
                     elevation = CardDefaults.cardElevation(2.dp),
-                    border = BorderStroke(1.dp,if(state.currentPage == index) Color.White else MainColor),
+                    border = BorderStroke(1.dp,if(state.currentPage == index) MainColor else Color.White),
                     onClick = {
                         scope.launch {
                             state.animateScrollToPage(index)
@@ -122,7 +122,7 @@ fun NotesScreen(
                             .fillMaxWidth()
                             .padding(vertical = 3.dp),
                         textAlign = TextAlign.Center,
-                        color = if(state.currentPage == index) Color.White else MainColor)
+                        color = if(state.currentPage == index) MainColor else Color.White)
                 }
             }
         }
@@ -248,87 +248,6 @@ fun NotesList(list : List<NotesModel>,viewModel: NotesViewModel,navController: N
     }
 }
 
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun NotesColCard(
-    title: String,
-    list: List<NotesModel>,
-    viewModel: NotesViewModel,
-    navController: NavController
-) {
-    var expanded by remember { mutableStateOf(false) }
-    Card(
-        modifier = Modifier.fillMaxWidth(.95f),
-        border = BorderStroke(1.dp, getHorizontalGradient()),
-        colors = CardDefaults.cardColors(
-            Color.Transparent
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        expanded = !expanded
-                    }
-                    .background(MainColor),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 20.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(title, textAlign = TextAlign.Center, color = TextColor)
-                }
-            }
-            var notesList by remember { mutableStateOf(listOf<NotesModel>()) }
-            var notesListOg by remember { mutableStateOf(listOf<NotesModel>()) }
-
-            if (expanded) {
-                notesListOg = list
-                var query by remember { mutableStateOf("") }
-                SearchBar(
-                    hint = "Search notes in ${if(list[0].subjectId.length >= 8 ) list[0].subjectId.substring(0, 8) + "..." else list[0].subjectId}",
-                    "",
-                    onTextChanged = {
-                        query = it
-                    })
-                if (query != "") {
-                    notesList = if (query != "")
-                        notesListOg.filter {
-                            it.title.lowercase().contains(query) || it.subjectId.lowercase()
-                                .contains(query) || it.courseId.lowercase().contains(query)
-                        }
-                    else
-                        notesListOg
-                } else {
-                    notesList = notesListOg
-                }
-                FlowRow(
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 20.dp)
-                ) {
-                    if (notesList.isNotEmpty()) {
-                        notesList.forEach() {
-                            Box(contentAlignment = Center, modifier = Modifier) {
-                                NotesItem(notes = it, viewModel, navController)
-                            }
-                        }
-                    } else {
-                        OnNoDataFound(msg = "No such notes found")
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun NotesItem(notes: NotesModel, viewModel: NotesViewModel, navController: NavController) {
