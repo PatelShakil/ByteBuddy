@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.shakilpatel.notesapp"
+    namespace = "com.shakilpatel.bytebuddy"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.shakilpatel.notesapp"
+        applicationId = "com.shakilpatel.bytebuddy"
         minSdk = 24
         targetSdk = 34
         versionCode = 9
@@ -46,7 +46,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.2"
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
     packaging {
         resources {

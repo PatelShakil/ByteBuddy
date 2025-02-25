@@ -11,9 +11,9 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
--keep class com.shakilpatel.notesapp.data.models.** { *; }
--keep class com.shakilpatel.notesapp.common.MyApplication
--keep class com.shakilpatel.notesapp.data.notification.** { *; }
+-keep class com.shakilpatel.bytebuddy.data.models.** { *; }
+-keep class com.shakilpatel.bytebuddy.common.MyApplication
+-keep class com.shakilpatel.bytebuddy.data.notification.** { *; }
 -keep class org.spongycastle.** { *; }
 -dontwarn org.spongycastle.**
 
