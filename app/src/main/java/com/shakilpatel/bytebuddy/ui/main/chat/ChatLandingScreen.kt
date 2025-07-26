@@ -1,5 +1,6 @@
 package com.shakilpatel.bytebuddy.ui.main.chat
 
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.shakilpatel.bytebuddy.common.MainColor
@@ -46,6 +48,7 @@ import kotlin.random.Random
 
 @Composable
 fun ChatLandingScreen(viewModel: ChatViewModel,navController: NavController,onBack:()->Unit) {
+    val context = LocalContext.current
 
     ByteBuddyTheme {
         Box(
@@ -70,7 +73,8 @@ fun ChatLandingScreen(viewModel: ChatViewModel,navController: NavController,onBa
                                 repeat(users){
                                     val width = Random.nextInt(from = 120, until = 300)
                                     Row(
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier
+                                            .fillMaxWidth()
                                             .padding(horizontal = 5.dp, vertical = 3.dp)
                                             .clip(RoundedCornerShape(15.dp))
                                             .shimmerEffect()
@@ -78,13 +82,15 @@ fun ChatLandingScreen(viewModel: ChatViewModel,navController: NavController,onBa
                                         verticalAlignment = Alignment.CenterVertically
                                     ){
                                         Box(
-                                            modifier= Modifier.size(50.dp)
+                                            modifier= Modifier
+                                                .size(50.dp)
                                                 .clip(CircleShape)
                                                 .shimmerEffect()
                                         )
                                         Box(
-                                            modifier = Modifier.width(width.dp)
-                                                .padding(start= 10.dp)
+                                            modifier = Modifier
+                                                .width(width.dp)
+                                                .padding(start = 10.dp)
                                                 .height(25.dp)
                                                 .clip(RoundedCornerShape(10.dp))
                                                 .shimmerEffect()
@@ -118,7 +124,8 @@ fun ChatLandingScreen(viewModel: ChatViewModel,navController: NavController,onBa
                                             Sp(h= 20.dp)
 
                                             Box(
-                                                modifier= Modifier.size(60.dp)
+                                                modifier= Modifier
+                                                    .size(60.dp)
                                                     .border(1.dp, MainColor, CircleShape)
                                                     .clip(CircleShape)
                                                     .clickable {
@@ -145,6 +152,15 @@ fun ChatLandingScreen(viewModel: ChatViewModel,navController: NavController,onBa
                                             user = pair.first,
                                             con = pair.second
                                         ) {
+                                            if(pair.first.uid.isNullOrEmpty()){
+                                                Toast.makeText(
+                                                    context,
+                                                    "User is removed...",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                    .show()
+                                                return@ConnectedChatUserCard
+                                            }
                                             viewModel.getRecieverUser(pair.first.uid)
                                             navController.navigate(Screen.Main.Chat.ChatUser.route)
                                         }

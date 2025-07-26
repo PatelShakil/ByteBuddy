@@ -17,7 +17,7 @@ android {
         applicationId = "com.shakilpatel.bytebuddy"
         minSdk = 24
         targetSdk = 34
-        versionCode = 9
+        versionCode = 10
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

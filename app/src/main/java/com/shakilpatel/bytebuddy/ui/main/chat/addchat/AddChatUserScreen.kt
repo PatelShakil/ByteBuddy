@@ -1,5 +1,6 @@
 package com.shakilpatel.bytebuddy.ui.main.chat.addchat
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.shakilpatel.bytebuddy.common.Resource
@@ -36,6 +38,7 @@ import kotlin.random.Random
 
 @Composable
 fun AddChatUserScreen(viewModel : ChatViewModel,navController: NavController) {
+    val context = LocalContext.current
     ByteBuddyTheme{
 //        viewModel.getAllUsers()
 
@@ -49,7 +52,8 @@ fun AddChatUserScreen(viewModel : ChatViewModel,navController: NavController) {
                         repeat(users){
                             val width = Random.nextInt(from = 120, until = 300)
                             Row(
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
                                     .padding(horizontal = 5.dp, vertical = 3.dp)
                                     .clip(RoundedCornerShape(15.dp))
                                     .shimmerEffect()
@@ -57,13 +61,15 @@ fun AddChatUserScreen(viewModel : ChatViewModel,navController: NavController) {
                                 verticalAlignment = Alignment.CenterVertically
                             ){
                                 Box(
-                                    modifier= Modifier.size(50.dp)
+                                    modifier= Modifier
+                                        .size(50.dp)
                                         .clip(CircleShape)
                                         .shimmerEffect()
                                 )
                                 Box(
-                                    modifier = Modifier.width(width.dp)
-                                        .padding(start= 10.dp)
+                                    modifier = Modifier
+                                        .width(width.dp)
+                                        .padding(start = 10.dp)
                                         .height(25.dp)
                                         .clip(RoundedCornerShape(10.dp))
                                         .shimmerEffect()
@@ -99,6 +105,10 @@ fun AddChatUserScreen(viewModel : ChatViewModel,navController: NavController) {
                             }
                             items(usersList) {
                                 AddChatUserCard(user = it) {
+                                    if(it.uid.isNullOrEmpty()){
+                                        Toast.makeText(context, "User is removed...", Toast.LENGTH_SHORT).show()
+                                        return@AddChatUserCard
+                                    }
                                     viewModel.getRecieverUser(it.uid)
                                     navController.navigate(Screen.Main.Chat.ChatUser.route)
 

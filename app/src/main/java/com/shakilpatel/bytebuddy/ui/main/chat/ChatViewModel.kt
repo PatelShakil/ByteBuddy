@@ -115,14 +115,19 @@ class ChatViewModel @Inject constructor(
                     return@addSnapshotListener
                 }
                 if (value != null) {
-                    val users = mutableListOf<UserModel>()
-                    for (doc in value.documents) {
-                        val user = doc.toObject(UserModel::class.java)
-                        if (user != null) {
-                            users.add(user)
+                    try {
+                        val users = mutableListOf<UserModel>()
+                        for (doc in value.documents) {
+                            val user = doc.toObject(UserModel::class.java)
+                            if (user != null) {
+                                users.add(user)
+                            }
                         }
+                        _allUsers.value = Resource.Success(users)
+                    }catch (e : Exception){
+                        e.printStackTrace()
                     }
-                    _allUsers.value = Resource.Success(users)
+
                 }
             }
     }
@@ -150,16 +155,22 @@ class ChatViewModel @Inject constructor(
                         val chats = mutableListOf<ConnectUserModel>()
                         val pairList = mutableListOf<Pair<UserModel, ConnectUserModel>>()
                         viewModelScope.launch {
-                            for (doc in value.documents) {
-                                val chat = doc.toObject(ConnectUserModel::class.java)
-                                if (chat != null) {
-                                    val user = getUser(if(uid == chat.senderId) chat.receiverId else chat.senderId)
-                                    pairList.add(Pair(user, chat))
-                                    chats.add(chat)
-                                    users.add(user)
+                            try {
+                                for (doc in value.documents) {
+                                    val chat = doc.toObject(ConnectUserModel::class.java)
+                                    if (chat != null) {
+                                        val user =
+                                            getUser(if (uid == chat.senderId) chat.receiverId else chat.senderId)
+                                        pairList.add(Pair(user, chat))
+                                        chats.add(chat)
+                                        users.add(user)
+                                    }
                                 }
+                                _connectedUsers.value =
+                                    Resource.Success(pairList.distinctBy { it.first.uid })
+                            }catch (e : Exception){
+                                e.printStackTrace()
                             }
-                            _connectedUsers.value = Resource.Success(pairList.distinctBy { it.first.uid })
                         }
                     }
                 }
@@ -179,7 +190,7 @@ class ChatViewModel @Inject constructor(
                         continuation.resume(user)
                     } else {
                         Log.d("USER ID",userId)
-                        continuation.resumeWithException(NullPointerException("User not found"))
+                        continuation.resume(UserModel())
                     }
                 }
                 .addOnFailureListener {
