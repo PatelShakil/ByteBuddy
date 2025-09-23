@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:name="com.shakilpatel.bytebuddy.common.MyApplication"
         android:theme="@style/Theme.NotesApp"
-        tools:targetApi="35">
+        tools:targetApi="36">
         <activity
             android:windowSoftInputMode="adjustResize"
             android:name="com.shakilpatel.bytebuddy.MainActivity"

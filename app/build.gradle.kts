@@ -11,13 +11,13 @@ plugins {
 
 android {
     namespace = "com.shakilpatel.bytebuddy"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.shakilpatel.bytebuddy"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 10
+        targetSdk = 36
+        versionCode = 11
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
