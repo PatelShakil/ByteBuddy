@@ -33,9 +33,7 @@ class MyApplication : Application() {
 
         //set below condition that the block can execute only if the release version of app was
 
-//        if (!BuildConfig.DEBUG) {
-            setupActivityListener()
-//        }
+        setupActivityListener()
     }
 
     private fun setupActivityListener() {

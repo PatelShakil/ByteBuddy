@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -38,7 +39,7 @@ import com.shakilpatel.bytebuddy.common.uicomponents.Sp
 import com.shakilpatel.bytebuddy.data.models.learning.NotesModel
 import com.shakilpatel.bytebuddy.data.models.user.UserModel
 import com.shakilpatel.bytebuddy.ui.main.feed.error.FAQViewModel
-import com.shakilpatel.bytebuddy.ui.main.home.notes.NotesItem
+import com.shakilpatel.bytebuddy.ui.main.home.notes.AnimatedNoteCard
 import com.shakilpatel.bytebuddy.ui.main.home.notes.NotesViewModel
 import com.shakilpatel.bytebuddy.ui.main.home.notes.Tabs
 import com.shakilpatel.bytebuddy.ui.nav.Screen
@@ -157,12 +158,15 @@ fun NotesSampleScreen(
                             columns = GridCells.Fixed(2),
                             horizontalArrangement = Arrangement.SpaceAround
                         ) {
-                            items(it.result) { note ->
+                            itemsIndexed(it.result) { index,note ->
                                 if (note != NotesModel()) {
                                     Box(
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        NotesItem(notes = note, viewModel, navController)
+                                        AnimatedNoteCard(index = index,
+                                            note = note,
+                                            viewModel = viewModel,
+                                            navController = navController)
                                     }
                                 }
                             }

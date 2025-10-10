@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -27,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -79,6 +82,7 @@ fun CusAppBar(navController: NavController, viewModel: AuthViewModel) {
             DefaultAppBar(title = title, navController = navController, viewModel = viewModel)
 
         }
+
         Screen.Notification.route -> {
             DefaultAppBar(title = title, navController = navController, viewModel = viewModel)
 
@@ -93,7 +97,8 @@ fun CusAppBar(navController: NavController, viewModel: AuthViewModel) {
             DefaultAppBar(title = title, navController = navController, viewModel = viewModel)
 
         }
-        Screen.Main.Chat.Landing.route->{
+
+        Screen.Main.Chat.Landing.route -> {
 //            ChatHomeAppBar(navController)
         }
 
@@ -115,7 +120,8 @@ fun ChatHomeAppBar(navController: NavController) {
         navigationIcon = {
             Sp(w = 10.dp)
             if (navController.currentBackStackEntryAsState().value?.destination?.route != Screen.Main.Home.Landing.route) {
-                Icon(Icons.Default.ArrowBack, "", tint = White,
+                Icon(
+                    Icons.Default.ArrowBack, "", tint = White,
                     modifier = Modifier.clickable {
                         navController.popBackStack()
                     })
@@ -129,25 +135,31 @@ fun ChatHomeAppBar(navController: NavController) {
 @Composable
 fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthViewModel) {
     var isLogoutClicked by remember { mutableStateOf(false) }
+
     TopAppBar(
-        modifier = Modifier.height(40.dp), title = {
+        modifier = Modifier, title = {
+
             Text(
                 title,
                 style = MaterialTheme.typography.titleLarge,
                 color = AppBarTextColor
             )
+
+
         },
         navigationIcon = {
             if (navController.currentBackStackEntryAsState().value?.destination?.route != Screen.Main.Home.Landing.route) {
                 Sp(w = 10.dp)
-                Icon(Icons.Default.ArrowBack, "", tint = White,
+                Icon(
+                    Icons.Default.ArrowBack, "", tint = White,
                     modifier = Modifier.clickable {
                         navController.popBackStack()
                     })
             }
         },
         actions = {
-            Icon(Icons.Default.ExitToApp, "",
+            Icon(
+                Icons.Default.ExitToApp, "",
                 tint = WhiteColor,
                 modifier = Modifier.clickable {
                     isLogoutClicked = !isLogoutClicked
@@ -157,27 +169,28 @@ fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthVi
             val c = viewModel.notiCount.intValue
             if (navController.currentBackStackEntryAsState().value?.destination?.route != Screen.Notification.route) {
                 Box {
-                    Icon(painterResource(R.drawable.ic_notifications), "",
+                    Icon(
+                        painterResource(R.drawable.ic_notifications), "",
                         tint = WhiteColor,
                         modifier = Modifier.clickable {
                             navController.navigate(Screen.Notification.route)
                         })
                     if (c > 0) {
-                            Text(
-                                if (c > 9) "9+" else c.toString(),
-                                style = MaterialTheme.typography.titleSmall,
-                                fontSize = 9.sp,
-                                modifier = Modifier
-                                    .background(RedColor,CircleShape)
-                                    .padding(horizontal = 4.dp)
-                                    .clip(
-                                        CircleShape
-                                    )
-                                    . align(
-                                        Alignment.TopEnd
-                                    ),
-                                color = WhiteColor
-                            )
+                        Text(
+                            if (c > 9) "9+" else c.toString(),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontSize = 9.sp,
+                            modifier = Modifier
+                                .background(RedColor, CircleShape)
+                                .padding(horizontal = 4.dp)
+                                .clip(
+                                    CircleShape
+                                )
+                                .align(
+                                    Alignment.TopEnd
+                                ),
+                            color = WhiteColor
+                        )
                     }
                 }
                 Sp(w = 10.dp)
@@ -187,6 +200,8 @@ fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthVi
         },
         backgroundColor = MainColor
     )
+
+
     if (isLogoutClicked) {
         ConfirmationDialog(msg = "Are you sure want to logout?", onDismiss = {
             isLogoutClicked = !isLogoutClicked
@@ -199,41 +214,41 @@ fun DefaultAppBar(title: String, navController: NavController, viewModel: AuthVi
         }
     }
 }
+    @Composable
+    fun NotesAppBar(
+        title: String,
+        navController: NavController,
+        actions: @Composable RowScope.() -> Unit = {}
+    ) {
+        TopAppBar(
+            modifier = Modifier, title = {
+                Text(
+                    title,
+                    color = AppBarTextColor
+                )
+            },
+            navigationIcon = {
+                Sp(w = 10.dp)
+                Icon(
+                    Icons.Default.ArrowBack, "", tint = White,
+                    modifier = Modifier.clickable {
+                        navController.popBackStack()
+                    })
+            },
+            actions = actions,
+            backgroundColor = MainColor
+        )
+    }
 
-@Composable
-fun NotesAppBar(
-    title: String,
-    navController: NavController,
-    actions: @Composable RowScope.() -> Unit = {}
-) {
-    TopAppBar(
-        modifier = Modifier, title = {
-            Text(
-                title,
-                color = AppBarTextColor
-            )
-        },
-        navigationIcon = {
-            Sp(w = 10.dp)
-            Icon(Icons.Default.ArrowBack, "", tint = White,
-                modifier = Modifier.clickable {
-                    navController.popBackStack()
-                })
-        },
-        actions = actions,
-        backgroundColor = MainColor
-    )
-}
-
-@Composable
-fun FAQAppBar(
-    title: String,
-    searchStr:String,
-    resultCount: Int,
-    navController: NavController,
-    onTextChanged: (String) -> Unit
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    @Composable
+    fun FAQAppBar(
+        title: String,
+        searchStr: String,
+        resultCount: Int,
+        navController: NavController,
+        onTextChanged: (String) -> Unit
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
 //        TopAppBar(
 //            modifier = Modifier.fillMaxWidth(),
 //            navigationIcon = {
@@ -248,45 +263,45 @@ fun FAQAppBar(
 //            },
 //            backgroundColor = MainColor
 //        )
-        SearchBar(hint = "Search your doubts/questions here",searchStr, onTextChanged = {
-            onTextChanged(it)
-        })
-        AnimatedVisibility(visible = resultCount != 0) {
-            Text(
-                text = "$resultCount Questions found",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MainColor)
-                    .padding(bottom = 5.dp),
-                textAlign = TextAlign.Center,
-                color = TextColor,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            SearchBar(hint = "Search your doubts/questions here", searchStr, onTextChanged = {
+                onTextChanged(it)
+            })
+            AnimatedVisibility(visible = resultCount != 0) {
+                Text(
+                    text = "$resultCount Questions found",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MainColor)
+                        .padding(bottom = 5.dp),
+                    textAlign = TextAlign.Center,
+                    color = TextColor,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
         }
-
     }
-}
 
-@Composable
-fun SubjectAppBar(title: String, navController: NavController) {
-    TopAppBar(
-        modifier = Modifier.fillMaxWidth(),
-        navigationIcon = {
-            Sp(w = 10.dp)
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowBack, "", tint = White,
-                modifier = Modifier.clickable {
-                    navController.popBackStack()
-                })
-        },
-        title = {
-            Text(
-                title,
-                style = MaterialTheme.typography.titleLarge,
-                color = AppBarTextColor
-            )
+    @Composable
+    fun SubjectAppBar(title: String, navController: NavController) {
+        TopAppBar(
+            modifier = Modifier.fillMaxWidth(),
+            navigationIcon = {
+                Sp(w = 10.dp)
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack, "", tint = White,
+                    modifier = Modifier.clickable {
+                        navController.popBackStack()
+                    })
+            },
+            title = {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = AppBarTextColor
+                )
 
-        },
-        backgroundColor = MainColor
-    )
-}
+            },
+            backgroundColor = MainColor
+        )
+    }

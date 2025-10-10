@@ -65,7 +65,7 @@ fun ByteBuddyTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = MaterialTheme.typography,
+        typography = ByteBuddyTypography,
         content = content
     )
 }

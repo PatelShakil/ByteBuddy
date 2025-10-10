@@ -6,6 +6,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
@@ -14,6 +15,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
@@ -26,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.firebase.auth.FirebaseAuth
+import com.shakilpatel.bytebuddy.common.MainColor
 import com.shakilpatel.bytebuddy.common.uicomponents.BadgeBottomNavigation
 import com.shakilpatel.bytebuddy.common.uicomponents.CusAppBar
 import com.shakilpatel.bytebuddy.ui.main.usersprofile.UsersProfileScreen
@@ -81,6 +85,14 @@ fun NotesAppNavHost(onBack: () -> Unit) {
     }
     ByteBuddyTheme {
         Scaffold(
+            modifier = Modifier
+                .background(
+                    if(navBackStackEntry.value?.destination?.route != Screen.Splash.route) MainColor else Color.Transparent
+                )
+                .padding(
+                top =                     if(navBackStackEntry.value?.destination?.route != Screen.Splash.route) 24.dp else 0.dp
+
+            ),
             bottomBar = {
                 AnimatedVisibility(
                     isBottomNavVisible,
